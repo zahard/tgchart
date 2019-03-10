@@ -1,0 +1,93 @@
+body {
+  font: 13px/18px Tahoma,sans-serif,Arial,Helvetica;
+}
+.square {
+  position: relative;
+  width: 100%;
+  }
+
+  .square:after {
+  content: "";
+  display: block;
+  padding-bottom: 100%;
+  }
+
+  .content {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  }
+
+.controls {
+  height: 15vw;
+  position: relative;
+  margin-top: 10vw;
+}
+
+.area-left {
+  left: 0;
+  width: 45%;
+}
+
+.area-cover {
+  z-index: 3;
+  background-color: rgba(220, 239, 255, 0.65);
+  position: absolute;
+  height: 100%;
+}
+
+.area-focused {
+  position: absolute;
+  height: 100%;
+  z-index: 0;
+  left: 45%;
+  width: 25%;
+  border: 2px solid #c1d9ea;
+  border-left-width: 4px;
+  border-right-width: 4px;
+  box-sizing: border-box;
+}
+.area-focused-drag {
+  position: absolute;
+  height: 100%;
+  z-index: 2;
+  left: 45%;
+  width: 25%;
+  box-sizing: border-box;
+}
+
+.area-right {
+  left: 70%;
+  width: 30%;
+}
+
+.drag-point {
+  box-sizing: border-box;
+  /*border:2px solid orange;*/
+  width: 5vw;
+  position: absolute;
+  height: 100%;
+  right: -3vw;
+  cursor: pointer;
+  z-index: 3;
+}
+
+.area-right .drag-point {
+  left: -3vw;
+  right: auto;
+}
+
+.area-left .drag-point {
+  left: auto;
+  right: -3vw;
+}
+
+
+.preview {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;    
+}

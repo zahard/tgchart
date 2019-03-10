@@ -63,6 +63,10 @@ const dragStart = (e) => {
   switch (e.target) {
     case dragItem:
       onDrag = onFrameDrag;
+
+      var scaled = scaleToBaseValue(data, median, 0.7);
+      animateData(data, scaled,'data-1', 100);
+
       break;
     case expandLeft:
       onDrag = onExpandLeft;
@@ -122,9 +126,13 @@ const onExpandRight = () => {
 }
 
 const dragEnd = (e) => {
-  console.log('DragEnd');
   active = false;
+  if (e.target === dragItem) {
+    var initData = scaleToBaseValue(data, median, 0.7);
+    animateData(initData, data,'data-1', 100);
+  }
 }
+
 function scalePath() {
   var pointPerView = viewWidth * (data.length - 1) / 100
   POINT_OFFSET = 400 / pointPerView;
