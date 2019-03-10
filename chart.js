@@ -22,7 +22,8 @@ class Chart {
 
     this.datasets.forEach((d,i) => {
       // Draw dataset chart
-      drawPath(this.svg, fitPath(d.data, this.maxValue, this.viewHeightPt, this.pointOffset), d.color, 3, 'data-'+ i);
+      d.id = 'data-'+ i;
+      drawPath(this.svg, fitPath(d.data, this.maxValue, this.viewHeightPt, this.pointOffset), d.color, 3, d.id);
 
       // Insert dataset checkbox 
       this.drawDatasetCheckbox(d);
@@ -67,8 +68,29 @@ class Chart {
   }
 
   toggleDataset(dataset, visible) {
-    console.log(dataset.name, visible);
+    dataset.visible = visible;
+
+    this.maxValue = Math.max.apply(null, this.datasets.map(d => d.visible ? d.max : 0));
+    
+    var previewBarHeight = 60;
+    var pointsOffset = this.viewWidthPt / (this.dataLen - 1);
+    this.datasets.forEach((d, i) => {
+      var data = d.visible ? d.data : new Array(this.dataLen).fill(-10);
+      this.udpatePath(fitPath(data, this.maxValue, previewBarHeight, pointsOffset), 'preview-' + d.id, this.svgPreview);
+    });
+
+    this.datasets.forEach((d,i) => {
+      var data = d.visible ? d.data : new Array(this.dataLen).fill(-10);
+      this.udpatePath(fitPath(data, this.maxValue, this.viewHeightPt, this.pointOffset), d.id, this.svg);
+    });
+
+    this.drawGrid();
   }
+
+  udpatePath(path, id, svg) {
+    svg.querySelector('#' + id).setAttribute('d', path);
+  }
+
 
   drawDatasetCheckbox(dataset) {
     var c = document.createElement('input');
@@ -89,6 +111,10 @@ class Chart {
   drawGrid() {
     var val, v,d,i;
     var gridWrap = document.querySelector('.grid');
+    while (gridWrap.firstChild) {
+      gridWrap.removeChild(gridWrap.firstChild);
+    }
+
     for(i = 0;i <= 5; i++) {
       val = this.maxValue * i * 18/100;
       val = Math.floor(val);
@@ -110,9 +136,9 @@ class Chart {
   drawPrivewBar() {
     var previewBarHeight = 60;
     var pointsOffset = this.viewWidthPt / (this.dataLen - 1);
-    const svgPreview = document.getElementById('svg-preview');
+    const svgPreview = this.svgPreview = document.getElementById('svg-preview');
     this.datasets.forEach((d, i) => {
-      drawPath(svgPreview, fitPath(d.data, this.maxValue, previewBarHeight, pointsOffset), d.color, 2, 'data-preview-' + i);
+      drawPath(svgPreview, fitPath(d.data, this.maxValue, previewBarHeight, pointsOffset), d.color, 1, 'preview-' + d.id);
     });
 
     this.preview = {
@@ -154,7 +180,9 @@ class Chart {
     this.pointOffset = 400 / pointPerView;
 
     this.datasets.forEach((d, i) => {
-      udpatePath(fitPath(d.data, this.maxValue, this.viewHeightPt, this.pointOffset), 'data-' + i);
+      if (d.visible) {
+        udpatePath(fitPath(d.data, this.maxValue, this.viewHeightPt, this.pointOffset), 'data-' + i);
+      }
     });
 
     this.updateRange();
