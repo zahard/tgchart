@@ -60,6 +60,7 @@ function animateData(initData, targetData, id, duration) {
 
     var len = initData.length;
     var progress = timeElapsed / duration;
+    var progress = Math.min(progress, 1);
     var from, to;
     var data = [];
 
@@ -71,12 +72,9 @@ function animateData(initData, targetData, id, duration) {
 
     udpatePath(fitPath(data, totalMax, 400, POINT_OFFSET),  'data-1');
 
-    if (timeElapsed < duration) {
+    if (progress < 1) {
       requestAnimationFrame(animateStep);
-    } else {
-      
     }
-    
   }
 
   animateStep();
@@ -105,7 +103,7 @@ var POINT_OFFSET = 20;
 
 
 //var data2 = generateData(120);
-var data = generateData(300);
+var data = generateData(311);
 
 var totalMax = Math.max.apply(null, data);
 var totalMin = Math.min.apply(null, data);
@@ -117,6 +115,30 @@ drawPath(svg, fitPath(data, totalMax, 400, POINT_OFFSET), '#f34c44', 3, 'data-1'
 
 
 var median = Math.round((totalMax - totalMin) / 2  +  totalMin);
+
+//console.log(totalMax);
+// Draw grid 
+
+var gridWrap = document.querySelector('.grid');
+console.log(totalMax);
+
+for(var i = 0;i <= 5; i++) {
+  var val = totalMax * i * 18/100;
+  val = Math.floor(val);
+  
+  
+
+  v = document.createElement('div')
+  v.className = 'grid--value';
+  v.innerText = val;
+
+  d = document.createElement('div')
+  d.className = 'grid--line';
+  d.style.bottom = (i * 18) + '%';
+
+  d.appendChild(v);
+  gridWrap.appendChild(d)
+}
 
 
 // Scale to median line
@@ -136,30 +158,6 @@ function goDown() {
   animateData(scaled, data, 'data-1', 250);
 }
 
-
-/*
-var targetData = data.slice(0);
-var animationData = new Array(data.length).fill(0);
-
-ii = 0;
-function animate() {
-  if (ii == 25) {
-    return;
-  }
-  ii++;
-  var len = targetData.length;
-  for (var i =0; i< len; i++) {
-    dx = targetData[i] / 25;
-    animationData[i] += dx;
-  }
-  udpatePath(fitPath(animationData, totalMax, 400, POINT_OFFSET), 'data-1');
-  
-  requestAnimationFrame(() => {
-    animate();
-  });
-}
-
-*/
 
 
 
