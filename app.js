@@ -101,9 +101,8 @@ function fitPath(data, maxValue, h, pointsOffset) {
 var POINT_OFFSET = 20;
 
 
-
-//var data2 = generateData(120);
-var data = generateData(311);
+var graph = chartData[0];
+var data = graph.columns[1].slice(1);
 
 var totalMax = Math.max.apply(null, data);
 var totalMin = Math.min.apply(null, data);
