@@ -1,6 +1,4 @@
 
-const svg = document.getElementById('svgroot');
-
 function generateData (max) {
   var data = [];
   for (let i=0; i<63;i++) {
@@ -98,46 +96,23 @@ function fitPath(data, maxValue, h, pointsOffset) {
   return pathPoints.join(' ');
 }
 
-var POINT_OFFSET = 20;
+
+const svg = document.getElementById('svgroot');
+
+//var POINT_OFFSET = 20;
 
 
-var graph = chartData[0];
-var data = graph.columns[1].slice(1);
+//var graph = chartData[0];
+//var data = graph.columns[1].slice(1);
 
-var totalMax = Math.max.apply(null, data);
-var totalMin = Math.min.apply(null, data);
+//var totalMax = Math.max.apply(null, data);
+//var totalMin = Math.min.apply(null, data);
 //var max2Value = Math.max.apply(null, data2);
 //var totalMax = Math.max(max1Value, max2Value);
 
-drawPath(svg, fitPath(data, totalMax, 400, POINT_OFFSET), '#f34c44', 3, 'data-1');
+//drawPath(svg, fitPath(data, totalMax, 400, POINT_OFFSET), '#f34c44', 3, 'data-1');
 //drawPath(svg, fitPath(data2,  totalMax, 400, POINT_OFFSET), '#3cc23f', 3, 'data-2');
 
-
-var median = Math.round((totalMax - totalMin) / 2  +  totalMin);
-
-//console.log(totalMax);
-// Draw grid 
-
-var gridWrap = document.querySelector('.grid');
-console.log(totalMax);
-
-for(var i = 0;i <= 5; i++) {
-  var val = totalMax * i * 18/100;
-  val = Math.floor(val);
-  
-  
-
-  v = document.createElement('div')
-  v.className = 'grid--value';
-  v.innerText = val;
-
-  d = document.createElement('div')
-  d.className = 'grid--line';
-  d.style.bottom = (i * 18) + '%';
-
-  d.appendChild(v);
-  gridWrap.appendChild(d)
-}
 
 
 // Scale to median line

@@ -9,12 +9,13 @@
 </head>
 <body>
     <h3>Followers</h3>
-    <div class="square"><div class="content">
-        <div class="grid">
+    <div class="square">
+        <div class="content">
+            <div class="grid"></div>
+            <svg width="100%" height="100%"  id="svgroot" viewbox="0 0 400 400"xmlns="http://www.w3.org/2000/svg">
+            </svg>
         </div>
-        <svg width="100%" height="100%"  id="svgroot" viewbox="0 0 400 400"xmlns="http://www.w3.org/2000/svg">
-        </svg>
-    </div></div>
+    </div>
 
     <div class="controls">
         <div class="area-cover area-left">
@@ -26,13 +27,15 @@
             <div class="drag-point"></div>
         </div>
         <div class="preview">
-                <svg width="100%" height="100%"  id="svg-preview" viewbox="0 0 400 60" xmlns="http://www.w3.org/2000/svg">
-                </svg>
+            <svg width="100%" height="100%"  id="svg-preview" viewbox="0 0 400 60" xmlns="http://www.w3.org/2000/svg">
+            </svg>
         </div>
     </div>
 
     <script src="chart_data.js"></script>
     <script src="app.js"></script>
-    <script src="preview.js"></script>
+    <script src="chart.js"></script>
+    
+    <!--<script src="preview.js"></script>-->
 </body>
 </html>
