@@ -197,38 +197,53 @@ class Chart {
   }
 
   drawXAxisData() {
-    var wrap = this.timepointsEl.parentNode;
-    wrap.removeChild(this.timepointsEl);
-    this.timepointsEl = document.createElement('div');
-    this.timepointsEl.className = 'timepoints';
-    wrap.appendChild(this.timepointsEl);
 
-
-    var pointVisible = Math.floor(400 / this.pointOffset);
-    
-    var timepointVisible = this.getVisibleTimepointsCount(pointVisible);
-    var timeoffset = Math.floor(pointVisible / timepointVisible);
-
-    var first = Math.ceil(this.viewOffset * this.dataLen / 100)
-    var last = first + timeoffset * timepointVisible;
-     
-     
-
-    for (var index, i = first; i <= last; i += timeoffset) {
-      if (i > this.dataLen - 1) {
-        index = this.dataLen - 1;
-      } else {
-        index = i;
+    if (!this.timepointsEl.children.length) {
+      for (var i = 0; i < this.dataLen; i++) {
+        var timeNode = document.createElement('div');
+        if (i !== 0 && i !== this.dataLen - 1) {
+          //timeNode.className = 'hidden';
+        }
+        timeNode.innerText = this.formatTimePoint(this.xAxis[i]);
+        this.timepointsEl.appendChild(timeNode);
       }
+    }
+      
+    var spaces = this.dataLen - 1;
+    var scale = 100 / this.viewWidth;
+    
+    this.timepointsEl.style.width = scale * 100 + '%';
+    this.timepointsEl.style.left = '-' + this.viewOffset * scale + '%';
 
-       var timeNode = document.createElement('div');
-       timeNode.innerText = this.formatTimePoint(this.xAxis[index]);
-       this.timepointsEl.appendChild(timeNode);  
-       if (index == this.dataLen - 1) {
-         break;
-       }
+    var minSpaces = Math.floor(scale * 4);
+    var maxSpaces = Math.ceil(scale * 5);
+    var mostSuitable;
+    var minDiff = Infinity;
+  
+      for (var s=minSpaces; s <= maxSpaces; s++) {
+        var diff = Math.abs(Math.round(spaces / s) - (spaces/s));
+        if (diff < minDiff) {
+          mostSuitable = s;
+          minDiff = diff;
+        }
     }
     
+    var step = (this.dataLen-1) / mostSuitable;
+    var  visible = []
+    for (var i = 1; i < mostSuitable - 1; i++) {
+      visible.push(Math.round(i * step));
+    }
+    
+
+    for (var i = 1; i < this.dataLen - 1; i++) {
+      var className = 'hidden';
+      if (i == visible[0]) {
+        className = 'visible';
+        visible.shift();
+      }
+      this.timepointsEl.children[i].className = className;
+    }
+
   }
 
   getVisibleTimepointsCount(pointVisible) {

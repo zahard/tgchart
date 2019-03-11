@@ -266,20 +266,59 @@ label.check {
 .xAxis {
   width: 100%;
   overflow: hidden;
+  position: relative;
+  height: 6vw;
+  margin-top: 2vw;
 }
+
+
+@keyframes timehide {
+  0%  {
+    width: 15vw;
+  }
+  
+  100% {
+    width: 0vw;
+  }
+}
+
+
+@keyframes timeshow {
+  0%  {
+    width: 0vw;
+  }
+  
+  100% {
+    width: 15vw;
+  }
+}
+
+
 
 .timepoints {
   display: flex;
   flex-direction: row;
   justify-content: space-between; 
+  position: absolute;
 }
 
-.xAxis div.hidden {
-  display: none;
+.timepoints div.hidden {
+  animation-name: timehide;
 }
 
-.xAxis div {
-  padding: 1vw;
+.timepoints div.visible {
+  animation-name: timeshow;
+}
+
+.timepoints div {
+  transition: flex 0.3s ease;
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
+  overflow: hidden;
+  width: 15vw;
+  box-sizing: border-box;
+  background: #ccc;
+  text-align: center;
   color: #9b9fa0;
   font-size: 3.5vw;
   line-height: 5vw;
