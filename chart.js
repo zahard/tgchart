@@ -243,6 +243,14 @@ class Chart {
         }
 
         this.timepointsEl.className = 'timepoints hidden ' + animationDir;
+
+        clearTimeout(this.removeHiddenTimePoint);
+        this.removeHiddenTimePoint = setTimeout(() => {
+          var toRemove = this.xAxisWrap.querySelector('.timepoints.hidden');
+          if (toRemove) {
+            this.xAxisWrap.removeChild(toRemove);
+          }
+        }, 600);
       }
     }
 
