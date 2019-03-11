@@ -78,13 +78,23 @@ class Chart {
     var previewBarHeight = 60;
     var pointsOffset = this.viewWidthPt / (this.dataLen - 1);
     this.datasets.forEach((d, i) => {
-      var data = d.visible ? d.data : new Array(this.dataLen).fill(-10);
-      this.udpatePath(fitPath(data, this.maxValue, previewBarHeight, pointsOffset), 'preview-' + d.id, this.svgPreview);
+      var path;
+      if (d.visible) {
+        path = fitPath(d.data, this.maxValue, previewBarHeight, pointsOffset);
+      } else {
+        path = ''
+      }
+      this.udpatePath(path, 'preview-' + d.id, this.svgPreview); 
     });
 
     this.datasets.forEach((d,i) => {
-      var data = d.visible ? d.data : new Array(this.dataLen).fill(-10);
-      this.udpatePath(fitPath(data, this.maxValue, this.viewHeightPt, this.pointOffset), d.id, this.svg);
+      var path;
+      if (d.visible) {
+        path = fitPath(d.data, this.maxValue, this.viewHeightPt, this.pointOffset)
+      } else {
+        path = ''
+      }
+      this.udpatePath(path, d.id, this.svg);
     });
 
     this.drawGrid();
@@ -129,9 +139,18 @@ class Chart {
     }
 
     var gridWrap = document.createElement('div');
+    var zeroExists = false;
     for (i = 0;i <= 5; i++) {
       val = this.maxValue * i * 18/100;
       val = Math.floor(val);
+
+      if (val === 0) {
+        if (!zeroExists) {
+          zeroExists = true;  
+        } else {
+          val = '';
+        }
+      }
       
       v = document.createElement('div')
       v.className = 'grid--value';
