@@ -105,6 +105,43 @@ class Chart {
     this.drawGrid();
   }
 
+  
+
+  redrawFrameView() {
+    this.datasets.forEach(d => {
+      if (d.visible) {
+        var path = fitPath(d.data, this.maxValue, this.viewHeightPt, this.pointOffset)
+        this.udpatePath(path, d.id, this.svg);
+      } 
+    });
+    this.drawGrid();
+  }
+
+  normalizeViewScale() {
+    this.prevMaxValue = this.maxValue;
+    this.maxValue = Math.max.apply(null, this.datasets.map(d => d.visible ? d.max : 0));
+    this.redrawFrameView();
+  }
+
+  maximizeViewScale() {
+    var first = Math.ceil(this.viewOffset / 100 * this.dataLen);
+    var last = Math.floor((this.viewOffset + this.viewWidth) / 100 * this.dataLen);
+
+    var maxValue = Math.max.apply(null, this.datasets.map(d => {
+      if (!d.visible) {
+        return 0;
+      }
+      return Math.max.apply(null, d.data.slice(first, last + 1));
+    }));
+
+    console.log(maxValue, first, last)
+
+    this.prevMaxValue = this.maxValue;
+    this.maxValue = maxValue;
+
+    this.redrawFrameView();
+  }
+
   udpatePath(path, id, svg) {
     svg.querySelector('#' + id).setAttribute('d', path);
   }
@@ -399,6 +436,8 @@ class Chart {
           onDrag = onExpandRight;
           break;
       }
+
+      this.normalizeViewScale();
     }
 
     const drag = (e) => {
@@ -462,6 +501,7 @@ class Chart {
         //var initData = scaleToBaseValue(data, median, 0.7);
         //animateData(initData, data,'data-1', 100);
       }
+      this.maximizeViewScale();
     }
     container.addEventListener("touchstart", dragStart, false);
     container.addEventListener("touchend", dragEnd, false);
