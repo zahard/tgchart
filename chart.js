@@ -3,7 +3,9 @@ class Chart {
   constructor (svgEl, graph) {
     this.svg = svgEl;
     this.datasetsSelect = document.querySelector('.datasets');
-    
+     
+    this.prevMaxValue = 0;
+
     // Svg size in anstract points
     this.viewHeightPt = 400;
     this.viewWidthPt = 400;
@@ -70,6 +72,7 @@ class Chart {
   toggleDataset(dataset, visible) {
     dataset.visible = visible;
 
+    this.prevMaxValue = this.maxValue;
     this.maxValue = Math.max.apply(null, this.datasets.map(d => d.visible ? d.max : 0));
     
     var previewBarHeight = 60;
@@ -96,26 +99,37 @@ class Chart {
     var c = document.createElement('input');
     c.type = "checkbox";
     c.checked = "true";
+    c.className = "check__input"
     c.addEventListener('change', () => {
       this.toggleDataset(dataset, c.checked);
     });
     
 
     var l = document.createElement('label');
+    l.className = "check"
     l.appendChild(c);
+
+    var s = document.createElement('span');
+    s.style.backgroundColor = dataset.color;
+    s.className = "check__box"
+    l.appendChild(s);
+
     l.appendChild(document.createTextNode(dataset.name));
-    l.style.background = dataset.color;
+
     this.datasetsSelect.appendChild(l);
   }
 
   drawGrid() {
     var val, v,d,i;
-    var gridWrap = document.querySelector('.grid');
-    while (gridWrap.firstChild) {
-      gridWrap.removeChild(gridWrap.firstChild);
+    var content = document.querySelector('.content');
+
+    // Grid with correct values already exists
+    if (content.querySelectorAll('.grid').length && this.prevMaxValue == this.maxValue) {
+      return;
     }
 
-    for(i = 0;i <= 5; i++) {
+    var gridWrap = document.createElement('div');
+    for (i = 0;i <= 5; i++) {
       val = this.maxValue * i * 18/100;
       val = Math.floor(val);
       
@@ -130,6 +144,32 @@ class Chart {
       d.appendChild(v);
       gridWrap.appendChild(d)
     }
+
+
+    var newGridClassName = 'grid';
+    
+
+    // If grid was already drawed
+    var oldGrids = content.querySelectorAll('.grid');
+    if (oldGrids && oldGrids.length) {
+      for (var i = 0; i < oldGrids.length - 1; i++) {
+        oldGrids[i].parentNode.removeChild(oldGrids[i]);
+      }
+      var oldGrid = oldGrids[oldGrids.length - 1];
+
+      var animationDirection = this.prevMaxValue > this.maxValue  ? 'up' : 'down'
+      oldGrid.className = 'grid fadeout-' + animationDirection;
+      newGridClassName = 'grid fadein-' + animationDirection;
+
+      setTimeout(() => {
+        if (oldGrid && oldGrid.parentNode) {
+         oldGrid.parentNode.removeChild(oldGrid);
+        }
+      }, 550);
+    }
+
+    gridWrap.className = newGridClassName;
+    content.appendChild(gridWrap);
   }
 
 
