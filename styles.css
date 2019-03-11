@@ -1,6 +1,10 @@
 body {
   font: 13px/18px Tahoma,sans-serif,Arial,Helvetica;
 }
+html {
+  
+}
+
 .square {
   position: relative;
   width: 100%;
@@ -26,7 +30,7 @@ body {
 .controls {
   height: 15vw;
   position: relative;
-  margin-top: 10vw;
+  margin-top: 2vw;
 }
 
 .area-left {
@@ -255,4 +259,29 @@ label.check {
   top: 3vw;
   left: 3vw;
 
+}
+
+
+
+.xAxis {
+  width: 100%;
+  overflow: hidden;
+}
+
+.timepoints {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between; 
+}
+
+.xAxis div.hidden {
+  display: none;
+}
+
+.xAxis div {
+  padding: 1vw;
+  color: #9b9fa0;
+  font-size: 3.5vw;
+  line-height: 5vw;
+  white-space: nowrap;
 }

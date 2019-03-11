@@ -3,7 +3,10 @@ class Chart {
   constructor (svgEl, graph) {
     this.svg = svgEl;
     this.datasetsSelect = document.querySelector('.datasets');
-     
+    this.timepointsEl = document.querySelector('.timepoints');
+    
+    this.monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
     this.prevMaxValue = 0;
 
     // Svg size in anstract points
@@ -38,6 +41,9 @@ class Chart {
 
     // Draw preview bar
     this.drawPrivewBar();
+
+    // Draw X Axis
+    this.drawXAxisData();
   }
 
   parseGraphData(graph) {
@@ -82,7 +88,7 @@ class Chart {
       if (d.visible) {
         path = fitPath(d.data, this.maxValue, previewBarHeight, pointsOffset);
       } else {
-        path = ''
+        path = '';
       }
       this.udpatePath(path, 'preview-' + d.id, this.svgPreview); 
     });
@@ -96,7 +102,6 @@ class Chart {
       }
       this.udpatePath(path, d.id, this.svg);
     });
-
     this.drawGrid();
   }
 
@@ -191,6 +196,60 @@ class Chart {
     content.appendChild(gridWrap);
   }
 
+  drawXAxisData() {
+    var wrap = this.timepointsEl.parentNode;
+    wrap.removeChild(this.timepointsEl);
+    this.timepointsEl = document.createElement('div');
+    this.timepointsEl.className = 'timepoints';
+    wrap.appendChild(this.timepointsEl);
+
+
+    var pointVisible = Math.floor(400 / this.pointOffset);
+    
+    var timepointVisible = this.getVisibleTimepointsCount(pointVisible);
+    var timeoffset = Math.floor(pointVisible / timepointVisible);
+
+    console.log(pointVisible, timepointVisible)
+
+    var first = Math.ceil(this.viewOffset * this.dataLen / 100)
+    var last = first + timeoffset * timepointVisible;
+     
+     
+
+    for (var i = first; i <= last; i += timeoffset) {
+       var timeNode = document.createElement('div');
+        timeNode.innerText = this.formatTimePoint(this.xAxis[i]);
+        this.timepointsEl.appendChild(timeNode);  
+    }
+    
+  }
+
+  getVisibleTimepointsCount(pointVisible) {
+    if (pointVisible < 6) {
+      return pointVisible;
+    }
+    if (pointVisible % 4 === 0) {
+      return 4;
+    }
+    if (pointVisible % 5 === 0) {
+      return 5;
+    }
+    var diff4 = Math.abs(Math.floor(pointVisible/4) - (pointVisible / 4));
+    var diff5 = Math.abs(Math.floor(pointVisible/5) - (pointVisible / 5));
+
+    return (diff4 <= diff5) ? 4 : 5;
+    
+  }
+
+
+
+  formatTimePoint(datetime) {
+    var date = new Date(datetime);
+    return [
+      this.monthNames[date.getMonth()],
+      date.getDate()
+    ].join(' ');
+  }
 
   drawPrivewBar() {
     var previewBarHeight = 60;
@@ -314,6 +373,7 @@ class Chart {
       this.viewOffset = viewOffset;
       this.updateRange();
       this.udpateRootOffset();
+      this.drawXAxisData();
     }
 
     const onExpandLeft = () => {  
@@ -335,6 +395,8 @@ class Chart {
       this.viewWidth = viewWidth;
 
       this.scalePath();
+
+      this.drawXAxisData();
     }
 
     const onExpandRight = () => {
@@ -343,6 +405,7 @@ class Chart {
       viewWidth = Math.min(100 - this.viewOffset, viewWidth);
       this.viewWidth = viewWidth;
       this.scalePath();
+      this.drawXAxisData();
     }
 
     const dragEnd = (e) => {
