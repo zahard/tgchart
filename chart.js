@@ -202,7 +202,7 @@ class Chart {
     this.timepointsEl.style.left = '-' + this.viewOffset * scale + '%';
   }
 
-  drawXAxisData() {      
+  drawXAxisData(expandDir) {      
     var spaces = this.dataLen - 1;
     var scale = 100 / this.viewWidth;
     
@@ -226,15 +226,18 @@ class Chart {
     }
     visible.push(this.dataLen - 1);
     
-    var animationDir = 'left';
+    var animationDir;
     if (this.timepointsEl) {
       var prevVisibleCount = this.timepointsEl.childElementCount;
       if (prevVisibleCount === visible.length) {
         this.moveTimeAxis();
         return;
       } else {
-        if (prevVisibleCount < visible.length) {
-          animationDir = 'right';
+
+        if (expandDir === 'right') {
+          animationDir = prevVisibleCount < visible.length ? 'right' : 'left';
+        } else {
+          animationDir = prevVisibleCount < visible.length ? 'left' : 'right';
         }
 
         var toRemove = this.xAxisWrap.querySelector('.timepoints.hidden');
@@ -441,7 +444,7 @@ class Chart {
 
       this.scalePath();
 
-      this.drawXAxisData();
+      this.drawXAxisData('left');
     }
 
     const onExpandRight = () => {
@@ -450,7 +453,7 @@ class Chart {
       viewWidth = Math.min(100 - this.viewOffset, viewWidth);
       this.viewWidth = viewWidth;
       this.scalePath();
-      this.drawXAxisData();
+      this.drawXAxisData('right');
     }
 
     const dragEnd = (e) => {

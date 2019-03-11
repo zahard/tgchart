@@ -291,7 +291,7 @@ label.check {
 
   100%  {
     opacity: 0;
-    left: 10vw;
+    left: 15vw;
   }
 }
 
@@ -299,32 +299,20 @@ label.check {
 @keyframes timeshowleft {
   0%  {
     opacity: 0;
-    left: 10vw;
   }
 
-  20%  {
-    opacity: 0.4;
-  }
-  
   100% {
     opacity: 1;
-    left: 0;
   }
 }
 
 @keyframes timeshowright {
   0%  {
     opacity: 0;
-    left: -10vw;
   }
 
-  20%  {
-    opacity: 0.4;
-  }
-  
   100% {
     opacity: 1;
-    left: 0;
   }
 }
 
@@ -338,11 +326,11 @@ label.check {
 }
 
 
-.timepoints.right:not(hidden) div {
+.timepoints.right:not(.hidden) div {
   animation-name: timeshowright; 
 }
 
-.timepoints.left:not(hidden) div {
+.timepoints.left:not(.hidden) div {
   animation-name: timeshowleft; 
 }
 
@@ -357,7 +345,7 @@ label.check {
 
 .timepoints div:first-child,
 .timepoints div:last-child {
-  animation-name: none; 
+  animation-name: none !important; 
 }
 
 .timepoints.hidden div:first-child,
