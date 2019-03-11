@@ -209,17 +209,24 @@ class Chart {
     var timepointVisible = this.getVisibleTimepointsCount(pointVisible);
     var timeoffset = Math.floor(pointVisible / timepointVisible);
 
-    console.log(pointVisible, timepointVisible)
-
     var first = Math.ceil(this.viewOffset * this.dataLen / 100)
     var last = first + timeoffset * timepointVisible;
      
      
 
-    for (var i = first; i <= last; i += timeoffset) {
+    for (var index, i = first; i <= last; i += timeoffset) {
+      if (i > this.dataLen - 1) {
+        index = this.dataLen - 1;
+      } else {
+        index = i;
+      }
+
        var timeNode = document.createElement('div');
-        timeNode.innerText = this.formatTimePoint(this.xAxis[i]);
-        this.timepointsEl.appendChild(timeNode);  
+       timeNode.innerText = this.formatTimePoint(this.xAxis[index]);
+       this.timepointsEl.appendChild(timeNode);  
+       if (index == this.dataLen - 1) {
+         break;
+       }
     }
     
   }
