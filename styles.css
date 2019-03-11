@@ -272,24 +272,59 @@ label.check {
 }
 
 
-@keyframes timehide {
-  0%  {
-    width: 15vw;
+@keyframes timehideleft {
+  0% {
+    opacity: 1;
+    left: 0;
   }
-  
-  100% {
-    width: 0vw;
+
+  100%  {
+    opacity: 0;
+    left: -10vw;
+  }
+}
+@keyframes timehideright {
+  0% {
+    opacity: 1;
+    left: 0;
+  }
+
+  100%  {
+    opacity: 0;
+    left: 10vw;
   }
 }
 
 
-@keyframes timeshow {
+@keyframes timeshowleft {
   0%  {
-    width: 0vw;
+    opacity: 0;
+    left: 10vw;
+  }
+
+  20%  {
+    opacity: 0.4;
   }
   
   100% {
-    width: 15vw;
+    opacity: 1;
+    left: 0;
+  }
+}
+
+@keyframes timeshowright {
+  0%  {
+    opacity: 0;
+    left: -10vw;
+  }
+
+  20%  {
+    opacity: 0.4;
+  }
+  
+  100% {
+    opacity: 1;
+    left: 0;
   }
 }
 
@@ -302,25 +337,44 @@ label.check {
   position: absolute;
 }
 
-.timepoints div.hidden {
-  animation-name: timehide;
+
+.timepoints.right:not(hidden) div {
+  animation-name: timeshowright; 
 }
 
-.timepoints div.visible {
-  animation-name: timeshow;
+.timepoints.left:not(hidden) div {
+  animation-name: timeshowleft; 
+}
+
+.timepoints.hidden.right div {
+  animation-name: timehideright; 
+}
+
+.timepoints.hidden.left div {
+  animation-name: timehideleft; 
+}
+
+
+.timepoints div:first-child,
+.timepoints div:last-child {
+  animation-name: none; 
+}
+
+.timepoints.hidden div:first-child,
+.timepoints.hidden div:last-child {
+  opacity: 0;
 }
 
 .timepoints div {
-  transition: flex 0.3s ease;
   animation-duration: 0.5s;
   animation-fill-mode: forwards;
   overflow: hidden;
   width: 15vw;
   box-sizing: border-box;
-  background: #ccc;
   text-align: center;
   color: #9b9fa0;
   font-size: 3.5vw;
   line-height: 5vw;
   white-space: nowrap;
+  position: relative;
 }

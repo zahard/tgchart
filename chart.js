@@ -3,7 +3,7 @@ class Chart {
   constructor (svgEl, graph) {
     this.svg = svgEl;
     this.datasetsSelect = document.querySelector('.datasets');
-    this.timepointsEl = document.querySelector('.timepoints');
+    this.xAxisWrap = document.querySelector('.xAxis');
     
     this.monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -196,54 +196,69 @@ class Chart {
     content.appendChild(gridWrap);
   }
 
-  drawXAxisData() {
+  moveTimeAxis() {
+    var scale = 100 / this.viewWidth;
+    this.timepointsEl.style.width = scale * 100 + '%';
+    this.timepointsEl.style.left = '-' + this.viewOffset * scale + '%';
+  }
 
-    if (!this.timepointsEl.children.length) {
-      for (var i = 0; i < this.dataLen; i++) {
-        var timeNode = document.createElement('div');
-        if (i !== 0 && i !== this.dataLen - 1) {
-          //timeNode.className = 'hidden';
-        }
-        timeNode.innerText = this.formatTimePoint(this.xAxis[i]);
-        this.timepointsEl.appendChild(timeNode);
-      }
-    }
-      
+  drawXAxisData() {      
     var spaces = this.dataLen - 1;
     var scale = 100 / this.viewWidth;
     
-    this.timepointsEl.style.width = scale * 100 + '%';
-    this.timepointsEl.style.left = '-' + this.viewOffset * scale + '%';
-
     var minSpaces = Math.floor(scale * 4);
     var maxSpaces = Math.ceil(scale * 5);
     var mostSuitable;
     var minDiff = Infinity;
   
-      for (var s=minSpaces; s <= maxSpaces; s++) {
-        var diff = Math.abs(Math.round(spaces / s) - (spaces/s));
-        if (diff < minDiff) {
-          mostSuitable = s;
-          minDiff = diff;
-        }
+    for (var s = minSpaces; s <= maxSpaces; s++) {
+      var diff = Math.abs(Math.round(spaces / s) - (spaces/s));
+      if (diff < minDiff) {
+        mostSuitable = s;
+        minDiff = diff;
+      }
     }
-    
+
     var step = (this.dataLen-1) / mostSuitable;
-    var  visible = []
+    var  visible = [0];
     for (var i = 1; i < mostSuitable - 1; i++) {
       visible.push(Math.round(i * step));
     }
+    visible.push(this.dataLen - 1);
     
+    var animationDir = 'left';
+    if (this.timepointsEl) {
+      var prevVisibleCount = this.timepointsEl.childElementCount;
+      if (prevVisibleCount === visible.length) {
+        this.moveTimeAxis();
+        return;
+      } else {
+        if (prevVisibleCount < visible.length) {
+          animationDir = 'right';
+        }
 
-    for (var i = 1; i < this.dataLen - 1; i++) {
-      var className = 'hidden';
-      if (i == visible[0]) {
-        className = 'visible';
-        visible.shift();
+        var toRemove = this.xAxisWrap.querySelector('.timepoints.hidden');
+        if (toRemove) {
+          this.xAxisWrap.removeChild(toRemove);
+        }
+
+        this.timepointsEl.className = 'timepoints hidden ' + animationDir;
       }
-      this.timepointsEl.children[i].className = className;
     }
 
+    var timepointsEl = document.createElement('div');
+    timepointsEl.className = 'timepoints ' + animationDir;
+    visible.forEach(index => {
+      var timeNode = document.createElement('div');
+      timeNode.innerText = this.formatTimePoint(this.xAxis[index]);
+      timepointsEl.appendChild(timeNode);
+    });
+
+    
+    this.xAxisWrap.appendChild(timepointsEl);
+    this.timepointsEl = timepointsEl;
+
+    this.moveTimeAxis();
   }
 
   getVisibleTimepointsCount(pointVisible) {
@@ -395,7 +410,7 @@ class Chart {
       this.viewOffset = viewOffset;
       this.updateRange();
       this.udpateRootOffset();
-      this.drawXAxisData();
+      this.moveTimeAxis();
     }
 
     const onExpandLeft = () => {  
@@ -448,3 +463,9 @@ class Chart {
 
 var chart = new Chart(document.getElementById('svgroot'), chartData[0]);
 
+function dr(v) {
+  v = v || 41.3;
+  chart.viewWidth = v;
+  chart.scalePath();
+  chart.drawXAxisData();
+}
