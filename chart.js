@@ -616,7 +616,7 @@ class Chart {
   }
 }
 
-var chart = new Chart(document.getElementById('svgroot'), chartData[2]);
+var chart = new Chart(document.getElementById('svgroot'), chartData[0]);
 
 function dr(v) {
   v = v || 41.3;
