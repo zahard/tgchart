@@ -5,7 +5,8 @@ class Chart {
     this.datasetsSelect = document.querySelector('.datasets');
     this.xAxisWrap = document.querySelector('.xAxis');
     
-    this.monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    this.monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 
+      'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
     this.prevMaxValue = 0;
 
@@ -28,7 +29,9 @@ class Chart {
     this.datasets.forEach((d,i) => {
       // Draw dataset chart
       d.id = 'data-'+ i;
-      drawPath(this.svg, fitPath(d.data, this.maxValue, this.viewHeightPt, this.pointOffset), d.color, 2, d.id);
+      drawPath(this.svg, 
+        fitPath(d.data, this.maxValue, this.viewHeightPt, this.pointOffset), 
+        d.color, 2, d.id);
 
       d.points = getPathPoints(d.data, this.maxValue, this.viewHeightPt, this.pointOffset);
 
@@ -48,6 +51,8 @@ class Chart {
     this.drawXAxisData();
 
     this.maximizeViewScale();
+
+    this.addChartDetails();
   }
 
   parseGraphData(graph) {
@@ -89,7 +94,8 @@ class Chart {
     // Hide animtion
     if (!visible) {
       var finalValue = this.prevMaxValue >  this.maxValue ? 150 : 0;
-      var path = getPathPoints(new Array(this.dataLen).fill(finalValue), 100, this.viewHeightPt, this.pointOffset);
+      var path = getPathPoints(new Array(this.dataLen)
+        .fill(finalValue), 100, this.viewHeightPt, this.pointOffset);
       this.animate(dataset, path, 300)
     }
 
@@ -169,8 +175,9 @@ class Chart {
         if (d.animation) {
           d.animation.cancelled = true;
         }
-        d.points = getPathPoints(d.data, this.maxValue, this.viewHeightPt, this.pointOffset);
-        //udpatePath(fitPath(d.data, this.maxValue, this.viewHeightPt, this.pointOffset), 'data-' + i);
+        d.points = getPathPoints(d.data, this.maxValue, 
+          this.viewHeightPt, this.pointOffset);
+        
         this.udpatePath(buildPath(d.points), d.id, this.svg);
       }
     });
@@ -458,7 +465,12 @@ class Chart {
     var pointsOffset = this.viewWidthPt / (this.dataLen - 1);
     const svgPreview = this.svgPreview = document.getElementById('svg-preview');
     this.datasets.forEach((d, i) => {
-      drawPath(svgPreview, fitPath(d.data, this.maxValue, previewBarHeight, pointsOffset), d.color, 1, 'preview-' + d.id);
+      drawPath(svgPreview, 
+        fitPath(d.data, this.maxValue, previewBarHeight, pointsOffset), 
+        d.color, 
+        1, 
+        'preview-' + d.id
+      );
     });
 
     this.preview = {
@@ -526,6 +538,7 @@ class Chart {
         initialX = e.clientX;
       }
 
+      this.removeInfoBubble();
       this.normalizeViewScale();
 
       switch (e.target) {
@@ -612,6 +625,68 @@ class Chart {
     container.addEventListener("mousedown", dragStart, false);
     container.addEventListener("mouseup", dragEnd, false);
     container.addEventListener("mousemove", drag, false);
+  }
+
+  addChartDetails() {
+    var chart = document.querySelector('.content');
+    chart.addEventListener("click", (e) => {
+      var b = this.frameBoundaryPoints();
+      var pointPos = e.offsetX / chart.offsetWidth;
+      // console.log(point)
+      var pointIndex = b.first + Math.round((b.last - b.first) * pointPos);      
+      var x = this.datasets[0].points[pointIndex * 2];
+
+      this.removeInfoBubble();
+      var group = createSvgNode('g', {
+        'id': 'bubble',
+      });
+      this.svg.appendChild(group);
+
+      group.appendChild(createSvgNode('line', {
+        'stroke': '#e8eaec',
+        'stroke-width': 2,
+        'x1': x,
+        'y1': 0,
+        'x2': x,
+        'y2': this.viewHeightPt
+      }));
+
+      this.datasets.forEach(d => {
+        var cx = d.points[pointIndex * 2];
+        var cy = d.points[pointIndex * 2 + 1];
+
+        group.appendChild(createSvgNode('circle', {
+          'cx': cx,
+          'cy': cy,
+          'r': 5,
+          'fill': '#fff',
+          'stroke-width': 2,
+          'stroke': d.color,
+        }));
+
+      });
+
+      group.appendChild(createSvgNode('rect', {
+        'x': x-30,
+        'y': 1,
+        'rx': 5,
+        'ry': 5,
+        'fill': '#fff',
+        'stroke-width': 2,
+        'stroke': '#cecece',
+        'width': 100,
+        'height': 60
+      }));
+
+
+    }, false);
+  }
+
+  removeInfoBubble() {
+    var dl = svg.querySelector('#bubble');
+    if (dl) {
+      dl.parentElement.removeChild(dl);
+    }
   }
 }
 
