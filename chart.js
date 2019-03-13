@@ -84,7 +84,7 @@ class Chart {
 
     this.maximizeViewScale();
 
-    console.log(this.prevMaxValue, this.maxValue)
+    //console.log(this.prevMaxValue, this.maxValue)
 
     // Hide animtion
     if (!visible) {
@@ -115,11 +115,12 @@ class Chart {
 
   
 
-  redrawFrameView() {
+  redrawFrameView(animationDur) {
+    animationDur = animationDur || 300;
     this.datasets.forEach(d => {
       if (d.visible) {
         var path = getPathPoints(d.data, this.maxValue, this.viewHeightPt, this.pointOffset);
-        this.animate(d, path, 300);
+        this.animate(d, path, animationDur);
       }
     });
 
@@ -139,7 +140,7 @@ class Chart {
     };
   }
 
-  maximizeViewScale() {
+  maximizeViewScale(animationDur) {
     var boundary = this.frameBoundaryPoints();
     var maxValue = Math.max.apply(null, this.datasets.map(d => {
       if (!d.visible) {
@@ -151,7 +152,7 @@ class Chart {
     this.prevMaxValue = this.maxValue;
     this.maxValue = maxValue;
 
-    this.redrawFrameView();
+    this.redrawFrameView(animationDur);
   }
 
   udpatePath(path, id, svg) {
@@ -525,13 +526,11 @@ class Chart {
         initialX = e.clientX;
       }
 
+      this.normalizeViewScale();
+
       switch (e.target) {
         case dragItem:
-          onDrag = onFrameDrag;
-          this.normalizeViewScale();
-          //var scaled = scaleToBaseValue(data, median, 0.7);
-          //animateData(data, scaled,'data-1', 100);
-
+          onDrag = onFrameDrag;    
           break;
         case expandLeft:
           onDrag = onExpandLeft;
