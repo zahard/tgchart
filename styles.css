@@ -5,6 +5,10 @@ html {
   
 }
 
+svg path {
+  transition: opacity 0.3s;
+}
+
 .square {
   position: relative;
   width: 100%;

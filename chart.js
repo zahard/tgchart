@@ -28,7 +28,9 @@ class Chart {
     this.datasets.forEach((d,i) => {
       // Draw dataset chart
       d.id = 'data-'+ i;
-      drawPath(this.svg, fitPath(d.data, this.maxValue, this.viewHeightPt, this.pointOffset), d.color, 3, d.id);
+      drawPath(this.svg, fitPath(d.data, this.maxValue, this.viewHeightPt, this.pointOffset), d.color, 2, d.id);
+
+      d.points = getPathPoints(d.data, this.maxValue, this.viewHeightPt, this.pointOffset);
 
       // Insert dataset checkbox 
       this.drawDatasetCheckbox(d);
@@ -44,6 +46,8 @@ class Chart {
 
     // Draw X Axis
     this.drawXAxisData();
+
+    this.maximizeViewScale();
   }
 
   parseGraphData(graph) {
@@ -78,31 +82,35 @@ class Chart {
   toggleDataset(dataset, visible) {
     dataset.visible = visible;
 
-    this.prevMaxValue = this.maxValue;
-    this.maxValue = Math.max.apply(null, this.datasets.map(d => d.visible ? d.max : 0));
+    this.maximizeViewScale();
+
+    console.log(this.prevMaxValue, this.maxValue)
+
+    // Hide animtion
+    if (!visible) {
+      var finalValue = this.prevMaxValue >  this.maxValue ? 150 : 0;
+      var path = getPathPoints(new Array(this.dataLen).fill(finalValue), 100, this.viewHeightPt, this.pointOffset);
+      this.animate(dataset, path, 300)
+    }
+
+    // Show / hide
+    this.svg.querySelector('#' + dataset.id).style.opacity = visible ? 1 : 0;
+
     
+    // Preview Bar
+    var maxVisibleValue = Math.max.apply(null, this.datasets.map(d => d.visible ? d.max : 0));
     var previewBarHeight = 60;
     var pointsOffset = this.viewWidthPt / (this.dataLen - 1);
     this.datasets.forEach((d, i) => {
       var path;
       if (d.visible) {
-        path = fitPath(d.data, this.maxValue, previewBarHeight, pointsOffset);
+        path = fitPath(d.data, maxVisibleValue, previewBarHeight, pointsOffset);
       } else {
         path = '';
       }
       this.udpatePath(path, 'preview-' + d.id, this.svgPreview); 
     });
 
-    this.datasets.forEach((d,i) => {
-      var path;
-      if (d.visible) {
-        path = fitPath(d.data, this.maxValue, this.viewHeightPt, this.pointOffset)
-      } else {
-        path = ''
-      }
-      this.udpatePath(path, d.id, this.svg);
-    });
-    this.drawGrid();
   }
 
   
@@ -110,10 +118,11 @@ class Chart {
   redrawFrameView() {
     this.datasets.forEach(d => {
       if (d.visible) {
-        var path = fitPath(d.data, this.maxValue, this.viewHeightPt, this.pointOffset)
-        this.udpatePath(path, d.id, this.svg);
-      } 
+        var path = getPathPoints(d.data, this.maxValue, this.viewHeightPt, this.pointOffset);
+        this.animate(d, path, 300);
+      }
     });
+
     this.drawGrid();
   }
 
@@ -123,18 +132,21 @@ class Chart {
     this.redrawFrameView();
   }
 
-  maximizeViewScale() {
-    var first = Math.ceil(this.viewOffset / 100 * this.dataLen);
-    var last = Math.floor((this.viewOffset + this.viewWidth) / 100 * this.dataLen);
+  frameBoundaryPoints() {
+    return {
+      first: Math.floor(this.viewOffset / 100 * this.dataLen),
+      last: Math.floor((this.viewOffset + this.viewWidth) / 100 * this.dataLen)
+    };
+  }
 
+  maximizeViewScale() {
+    var boundary = this.frameBoundaryPoints();
     var maxValue = Math.max.apply(null, this.datasets.map(d => {
       if (!d.visible) {
         return 0;
       }
-      return Math.max.apply(null, d.data.slice(first, last + 1));
+      return Math.max.apply(null, d.data.slice(boundary.first, boundary.last + 1));
     }));
-
-    console.log(maxValue, first, last)
 
     this.prevMaxValue = this.maxValue;
     this.maxValue = maxValue;
@@ -145,6 +157,88 @@ class Chart {
   udpatePath(path, id, svg) {
     svg.querySelector('#' + id).setAttribute('d', path);
   }
+
+
+  scalePath() {
+    var pointPerView = this.viewWidth * (this.dataLen - 1) / 100;
+    this.pointOffset = 400 / pointPerView;
+
+    this.datasets.forEach((d, i) => {
+      if (d.visible) {
+        if (d.animation) {
+          d.animation.cancelled = true;
+        }
+        d.points = getPathPoints(d.data, this.maxValue, this.viewHeightPt, this.pointOffset);
+        //udpatePath(fitPath(d.data, this.maxValue, this.viewHeightPt, this.pointOffset), 'data-' + i);
+        this.udpatePath(buildPath(d.points), d.id, this.svg);
+      }
+    });
+
+
+
+    this.updateRange();
+    this.udpateRootOffset();
+  }
+
+  animate(dataset, targetData, duration) {
+    var initData = dataset.points.slice();
+
+    var start = Date.now();
+    var timeElapsed = 0;
+    var dt;
+    var now; 
+
+    var animationControl = {
+      cancelled: false,
+      finished: false,
+      id: randomInteger(0, 5000)
+    };
+
+    const animateStep = () => {
+      if (animationControl.finished || animationControl.cancelled) {
+        return
+      }
+
+      now = Date.now();
+      dt = now - start;
+      timeElapsed += dt;
+      start = now;
+
+      var len = initData.length;
+      var progress = Math.min(timeElapsed / duration, 1);
+      var from, to;
+      var data = [];
+
+      for (var i = 0; i < len; i +=2 ) {
+        data[i] = initData[i]
+        from = initData[i + 1];
+        to = targetData[i + 1];
+        data[i+1] = (to - from) * progress + from;
+      }
+
+      this.udpatePath(buildPath(data), dataset.id, this.svg);
+
+      // Save current points to keep current chart position
+      dataset.points = data;
+
+      if (progress < 1) {
+        requestAnimationFrame(animateStep);
+      } else {
+        animationControl.finished = true;
+      }
+    }
+
+    animateStep();
+
+    // If there is not pending animation - cancel it
+    if (dataset.animation && !dataset.animation.finished) {
+      dataset.animation.cancelled = true;
+    }
+    
+    // Set updated animation object
+    dataset.animation = animationControl;
+  }
+
 
 
   drawDatasetCheckbox(dataset) {
@@ -183,8 +277,8 @@ class Chart {
     var gridWrap = document.createElement('div');
     var zeroExists = false;
     for (i = 0;i <= 5; i++) {
-      val = this.maxValue * i * 18/100;
-      val = Math.floor(val);
+      val =  Math.floor(this.maxValue * i * 18/100);
+      val = this.formatValue(val);
 
       if (val === 0) {
         if (!zeroExists) {
@@ -231,6 +325,28 @@ class Chart {
 
     gridWrap.className = newGridClassName;
     content.appendChild(gridWrap);
+  }
+
+  formatValue(val) {
+    /**
+      4
+      5 12456  -> 12.4k
+      6 123456 -> 123k
+      7 1234567 -> 1.23m
+      8 12345679 -> 12.3m
+      9 123456790 -> 123m
+    */
+    var num = Math.floor(val);
+    var digitsCount = String(num).length;
+    if (digitsCount < 5) {
+      return num;
+    }
+    var tailLen =  digitsCount > 9 ? 0 : (9 - digitsCount) % 3;
+    var intLen = digitsCount > 9  ? 6 : digitsCount - (3-tailLen);
+    var scaled = (num / Math.pow(10, intLen)).toFixed(tailLen);
+    var literal = digitsCount < 7 ? 'k' : 'm';
+    console.log(num, tailLen, digitsCount, scaled + literal)
+    return scaled + literal;
   }
 
   moveTimeAxis() {
@@ -378,19 +494,7 @@ class Chart {
     this.svg.setAttribute('viewBox', `${offset} 0 400 400`);
   }
   
-  scalePath() {
-    var pointPerView = this.viewWidth * (this.dataLen - 1) / 100;
-    this.pointOffset = 400 / pointPerView;
-
-    this.datasets.forEach((d, i) => {
-      if (d.visible) {
-        udpatePath(fitPath(d.data, this.maxValue, this.viewHeightPt, this.pointOffset), 'data-' + i);
-      }
-    });
-
-    this.updateRange();
-    this.udpateRootOffset();
-  }
+  
 
   addRangeListeners() {  
     var container  = document.querySelector('.controls');
@@ -424,7 +528,7 @@ class Chart {
       switch (e.target) {
         case dragItem:
           onDrag = onFrameDrag;
-
+          this.normalizeViewScale();
           //var scaled = scaleToBaseValue(data, median, 0.7);
           //animateData(data, scaled,'data-1', 100);
 
@@ -437,7 +541,7 @@ class Chart {
           break;
       }
 
-      this.normalizeViewScale();
+      
     }
 
     const drag = (e) => {
@@ -512,7 +616,7 @@ class Chart {
   }
 }
 
-var chart = new Chart(document.getElementById('svgroot'), chartData[0]);
+var chart = new Chart(document.getElementById('svgroot'), chartData[2]);
 
 function dr(v) {
   v = v || 41.3;

@@ -1,4 +1,5 @@
 
+
 function generateData (max) {
   var data = [];
   for (let i=0; i<63;i++) {
@@ -96,6 +97,28 @@ function fitPath(data, maxValue, h, pointsOffset) {
   return pathPoints.join(' ');
 }
 
+function getPathPoints(data, maxValue, h, pointsOffset) {
+  var len = data.length;
+  var dx = 0;
+  var pathPoints = [];
+  for (let i = 0; i < len; i++) {
+    val = h * (1 - data[i] / maxValue);
+    
+    pathPoints.push(dx, val);
+    dx += pointsOffset;
+  }
+  return pathPoints;
+}
+
+function buildPath(pathPoints) {
+  var len = pathPoints.length;
+  var path = [];
+  for (let i = 0; i < len; i+=2) {
+    path.push(`L${pathPoints[i]} ${pathPoints[i+1]}`);
+  }
+  path[0] = path[0].replace('L', 'M');
+  return path.join(' ');
+}
 
 const svg = document.getElementById('svgroot');
 
