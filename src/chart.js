@@ -748,7 +748,6 @@ export default class Chart {
     }, false);
 
     this.viewWrapper.addEventListener("touchmove", (e) => {
-      e.preventDefault();
       var offset = this.viewWrapper.getBoundingClientRect().x;
       this.viewTouched(e.touches[0].clientX + offset);
     }, false);
