@@ -26,11 +26,8 @@
 
         document.querySelector('.theme-switch').addEventListener('click', function(){
             var body = document.body;
-            if (body.className.indexOf('theme-dark') >= 0) {
-                body.className = '';
-            } else {
-                body.className = 'theme-dark';
-            }
+            var toggle = 'theme-dark';
+            body.className = body.className.indexOf(toggle) >= 0 ? '' : toggle;
         });
     </script>
 </body>
