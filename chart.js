@@ -764,14 +764,6 @@ class Chart {
 
 var chart = new Chart(document.getElementById('svgroot'), chartData[0]);
 
-function dr(v) {
-  v = v || 41.3;
-  chart.viewWidth = v;
-  chart.scalePath();
-  chart.drawXAxisData();
-}
-
-
 var cWrap = document.querySelector('.chart-wrap');
 var onResize = () => {
   cWrap.style.fontSize = Math.round(cWrap.offsetWidth / 25) + 'px';
