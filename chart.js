@@ -639,71 +639,64 @@ class Chart {
     container.addEventListener("mousemove", drag, false);
   }
 
-  addChartDetails() {
+  viewTouched(offsetX) {
+    var pointPos = offsetX / this.viewWrapper.offsetWidth;
+    var pointPercentPos =  this.viewOffset + this.viewWidth * pointPos;
+    var pointIndex = Math.round((this.dataLen - 1)* pointPercentPos / 100);
 
-    var chart = document.querySelector('.content');
-    chart.addEventListener("click", (e) => {
-      e.preventDefault();
-      var b = this.frameBoundaryPoints();
-      var pointPos = e.offsetX / chart.offsetWidth;
-      //var pointIndex = b.first + Math.round((b.last - b.first) * pointPos);
-      
-      var pointPercentPos =  this.viewOffset + this.viewWidth * pointPos;
+    if (this.activePointInfo === pointIndex) {
+      return;
+    }
+    this.activePointInfo = pointIndex;
 
-     
-      var pointIndex = Math.round((this.dataLen - 1)* pointPercentPos / 100);
+    var x = this.datasets[0].points[pointIndex * 2];
 
-      console.log(pointPos, pointPercentPos, pointIndex)
-      
-      var x = this.datasets[0].points[pointIndex * 2];
+    this.removeInfoLine();
+    var group = createSvgNode('g', {
+      'id': 'bubble',
+    });
+    this.svg.appendChild(group);
 
-      this.removeInfoLine();
-      var group = createSvgNode('g', {
-        'id': 'bubble',
-      });
-      this.svg.appendChild(group);
+    group.appendChild(createSvgNode('line', {
+      'stroke': '#e8eaec',
+      'stroke-width': 2,
+      'x1': x,
+      'y1': 0,
+      'x2': x,
+      'y2': this.viewHeightPt
+    }));
 
-      group.appendChild(createSvgNode('line', {
-        'stroke': '#e8eaec',
+    this.datasets.forEach(d => {
+      var cx = d.points[pointIndex * 2];
+      var cy = d.points[pointIndex * 2 + 1];
+
+      group.appendChild(createSvgNode('circle', {
+        'cx': cx,
+        'cy': cy,
+        'r': 4,
+        'fill': '#fff',
         'stroke-width': 2,
-        'x1': x,
-        'y1': 0,
-        'x2': x,
-        'y2': this.viewHeightPt
+        'stroke': d.color,
       }));
 
-      this.datasets.forEach(d => {
-        var cx = d.points[pointIndex * 2];
-        var cy = d.points[pointIndex * 2 + 1];
-
-        group.appendChild(createSvgNode('circle', {
-          'cx': cx,
-          'cy': cy,
-          'r': 4,
-          'fill': '#fff',
-          'stroke-width': 2,
-          'stroke': d.color,
-        }));
-
-      });    
-    
-      var createEl = (parent, tag, className, styles) => {
-        let el = document.createElement(tag);
-        el.className = className;
-        if (styles) {
-          for (var i in styles) {
-            el.style[i] = styles[i];
-          }
+    });    
+  
+    var createEl = (parent, tag, className, styles) => {
+      let el = document.createElement(tag);
+      el.className = className;
+      if (styles) {
+        for (var i in styles) {
+          el.style[i] = styles[i];
         }
-        if (parent) {
-          parent.appendChild(el);
-        }
-        return el;
       }
+      if (parent) {
+        parent.appendChild(el);
+      }
+      return el;
+    }
     
     var b = document.querySelector('.bubble');
     if (!b) {
-      console.log('cREATE', b)
       b = createEl(document.querySelector('.square'), 'div', 'bubble');
       createEl(b, 'div', 'bubble--date');
       createEl(b, 'div', 'bubble--content');
@@ -729,12 +722,27 @@ class Chart {
     
     b.style.opacity = 1;
 
-    var w = b.offsetWidth/chart.offsetWidth * 100;
+    var w = b.offsetWidth / this.viewWrapper.offsetWidth * 100;
     var left = Math.max(0, pointViewRelativePos - w / 2);
     left = Math.min(left, 100 - w);
     b.style.left = left + '%';
 
+  } 
+
+  addChartDetails() {
+    this.viewWrapper = document.querySelector('.content');
+
+    this.viewWrapper.addEventListener("click", (e) => {
+      e.preventDefault();
+      this.viewTouched(e.offsetX);
     }, false);
+
+    this.viewWrapper.addEventListener("touchmove", (e) => {
+      e.preventDefault();
+      var offset = this.viewWrapper.getBoundingClientRect().x;
+      this.viewTouched(e.touches[0].clientX + offset);
+    }, false);
+
   }
 
   removeInfoLine() {
@@ -750,6 +758,7 @@ class Chart {
       b.parentElement.removeChild(b);
     }
     this.removeInfoLine();  
+    this.activePointInfo = null;
   }
 }
 
