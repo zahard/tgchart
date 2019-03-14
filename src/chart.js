@@ -115,8 +115,6 @@ export default class Chart {
 
     this.maximizeViewScale();
 
-    //console.log(this.prevMaxValue, this.maxValue)
-
     // Hide animtion
     if (!visible) {
       var finalValue = this.prevMaxValue >  this.maxValue ? 150 : 0;
@@ -381,7 +379,7 @@ export default class Chart {
     var intLen = digitsCount > 9  ? 6 : digitsCount - (3-tailLen);
     var scaled = (num / Math.pow(10, intLen)).toFixed(tailLen);
     var literal = digitsCount < 7 ? 'k' : 'm';
-    console.log(num, tailLen, digitsCount, scaled + literal)
+
     return scaled + literal;
   }
 
