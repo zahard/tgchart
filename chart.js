@@ -106,7 +106,7 @@ class Chart {
     
     // Preview Bar
     var maxVisibleValue = Math.max.apply(null, this.datasets.map(d => d.visible ? d.max : 0));
-    var previewBarHeight = 60;
+    var previewBarHeight = 48;
     var pointsOffset = this.viewWidthPt / (this.dataLen - 1);
     this.datasets.forEach((d, i) => {
       var path;
@@ -268,6 +268,7 @@ class Chart {
 
     var s = document.createElement('span');
     s.style.backgroundColor = dataset.color;
+    s.style.borderColor = dataset.color;
     s.className = "check__box"
     l.appendChild(s);
 
@@ -456,7 +457,7 @@ class Chart {
   formatTime(datetime) {
     var date = new Date(datetime);
     return [
-      this.weekNames[date.getDay()],
+      this.weekNames[date.getDay()] + ',',
       this.monthNames[date.getMonth()],
       date.getDate()
     ].join(' ');
@@ -471,7 +472,7 @@ class Chart {
   }
 
   drawPrivewBar() {
-    var previewBarHeight = 60;
+    var previewBarHeight = 48;
     var pointsOffset = this.viewWidthPt / (this.dataLen - 1);
     const svgPreview = this.svgPreview = document.getElementById('svg-preview');
     this.datasets.forEach((d, i) => {
@@ -760,3 +761,11 @@ function dr(v) {
   chart.scalePath();
   chart.drawXAxisData();
 }
+
+
+var cWrap = document.querySelector('.chart-wrap');
+var onResize = () => {
+  cWrap.style.fontSize = Math.round(cWrap.offsetWidth / 25) + 'px';
+};
+window.addEventListener('resize', onResize);
+onResize();

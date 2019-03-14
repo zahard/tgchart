@@ -13,8 +13,13 @@ html {
 }
 
 .chart-wrap {
-  width: 550px;
-  font-size: 22px;
+  width: 100%;
+  font-size: 16px;
+}
+
+h2 {
+  font-size: 5vw;
+  color: #444;
 }
 
 svg path {
@@ -44,8 +49,9 @@ svg path {
   }
 
 .controls {
-  height: 15vw;
+  height: 3em;
   position: relative;
+  margin-bottom: 0.75em;
 }
 
 .area-left {
@@ -94,22 +100,21 @@ svg path {
 .drag-point {
   box-sizing: border-box;
   /*border:2px solid orange;*/
-  width: 2.5rem;
+  width: 2.5em;
   position: absolute;
   height: 100%;
-  right: -0.5rem;
   cursor: pointer;
   z-index: 3;
 }
 
 .area-right .drag-point {
-  left: -0.5rem;
+  left: -0.5em;
   right: auto;
 }
 
 .area-left .drag-point {
   left: auto;
-  right: -3vw;
+  right: -0.5em;
 }
 
 
@@ -211,54 +216,52 @@ svg path {
   z-index: 2;
   width: 100%;
   position: absolute;
-  border-bottom: 0.1rem solid #f2f4f5;
-  height: 2rem;
+  border-bottom: 0.1em solid #f2f4f5;
+  height: 2em;
 }
 .grid--value {
   color: #9b9fa0;
-  font-size: 1rem;
-  line-height: 2rem;
+  font-size: 1em;
+  line-height: 2em;
 }
 
 
 .datasets {
-  margin-top: 2vw;
+  margin-bottom: 0.75em;
 }
 label.check {
-  border: 1px solid #ccc;
-    height: 10vw;
-    border-radius: 5vw;
+  border: 0.1em solid #e6ecf1;
+    height: 2.4em;
+    border-radius: 1.2em;
     box-sizing: content-box;
-    padding-left: 10vw;
+    padding-left: 2.4em;
     display: block;
     float: left;
-    margin-right: 5vw;
+    margin-right: 1em;
     position: relative;
-    padding-right: 3vw;
-    line-height: 10vw;
-    font-size: 4vw;
+    padding-right: 0.75em;
+    line-height: 2.4em;
     color: #494949;
     cursor: pointer;
 }
 
 .check__input {
-    position: absolute;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    width: 0;
-    height: 0;
-    border: none;
-    opacity: 0;
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: none;
+  opacity: 0;
+  top: 0;
+  left: 0;
 }
 
 .check__box {
   position: absolute;
-  width: 6vw;
-  height: 6vw;
-  border-radius: 3vw;
-  top: 2vw;
-  left: 2vw;
+  width: 1.6em;
+  height: 1.6em;
+  border-radius: 1em;
+  top: 0.4em;
+  left: 0.4em;
   background-image: none;
 }
 
@@ -266,12 +269,16 @@ label.check {
   content: '';
   position: absolute;
   background: #fff;
-  height: 5vw;
-  width: 5vw;
-  top: 0.5vw;
-  left: 0.5vw;
-  border-radius: 3vw;
+  height: 1.6em;
+  width: 1.6em;
+  top: 0;
+  left: 0;
+  border-radius: 2em;
   transition: top 0.1s, left 0.1s, width 0.1s, height 0.1s;
+  border-style: solid;
+  border-width: 0.2rem;
+  border-color: inherit;
+  box-sizing: border-box;
 }
 
 .check__input:checked + .check__box {
@@ -279,11 +286,11 @@ label.check {
 }
 
 .check__input:checked + .check__box::after {
-  height: 0vw;
-  width: 0vw;
-  top: 3vw;
-  left: 3vw;
-
+  height: 0;
+  width: 0;
+  top: 0.8em;
+  left: 0.8em;
+  border-width: 0;
 }
 
 .bubble {
@@ -291,7 +298,7 @@ label.check {
   position: absolute;
   top: 0;
   transition: left 0.2s, opacity 0.1s;
-  padding: 1rem 1.2rem;
+  padding: 0.8em 1.2em;
   box-shadow: 1px 1px 3px 0px #999;
   border-radius: 0.3rem;
   background: #fff;
@@ -300,10 +307,9 @@ label.check {
 }
 
 .bubble--date {
-  font-size: 1.2rem;
+  font-size: 1.1em;
   white-space: nowrap;
-  /* padding-bottom: 1.5vw; */
-  padding-bottom: 0.3rem;
+  padding-bottom: 0.5em;
   color: #222;
 }
 
@@ -318,15 +324,18 @@ label.check {
 }
 
 .bubble--dataset {
-  padding-right: 3.5vw;
-  font-size: 1rem;
+  padding-right: 1.5em;
+}
+
+.bubble--dataset span {
+  font-size: 1em;
 }
 
 .bubble--dataset strong {
   display: block;
-  font-size: 1.4rem;
+  font-size: 1.4em;
   font-weight: bold;
-  padding-bottom: 1vw;
+  padding-bottom: 0.25em;
 }
 
 
@@ -334,8 +343,8 @@ label.check {
   width: 100%;
   overflow: hidden;
   position: relative;
-  height: 2.5rem;
-  margin-bottom: 0.75rem;
+  height: 2.5em;
+  margin-bottom: 0.75em;
 }
 
 
@@ -424,12 +433,12 @@ label.check {
   animation-duration: 0.5s;
   animation-fill-mode: forwards;
   overflow: hidden;
-  width: 4.5rem;
+  width: 4.5em;
   box-sizing: border-box;
   text-align: center;
   color: #9b9fa0;
-  font-size: 1rem;
-  line-height: 2.5rem;
+  font-size: 1em;
+  line-height: 2.5em;
   white-space: nowrap;
   position: relative;
 }
