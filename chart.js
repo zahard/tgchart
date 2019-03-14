@@ -117,6 +117,8 @@ class Chart {
       this.udpatePath(path, 'preview-' + d.id, this.svgPreview); 
     });
 
+    //this.removeInfoBubble();
+
   }
 
   
@@ -450,7 +452,14 @@ class Chart {
     
   }
 
-
+  formatTime(datetime) {
+    var date = new Date(datetime);
+    return [
+      'Sat,',
+      this.monthNames[date.getMonth()],
+      date.getDate()
+    ].join(' ');
+  }
 
   formatTimePoint(datetime) {
     var date = new Date(datetime);
@@ -628,15 +637,17 @@ class Chart {
   }
 
   addChartDetails() {
+
     var chart = document.querySelector('.content');
     chart.addEventListener("click", (e) => {
+
       var b = this.frameBoundaryPoints();
       var pointPos = e.offsetX / chart.offsetWidth;
       // console.log(point)
       var pointIndex = b.first + Math.round((b.last - b.first) * pointPos);      
       var x = this.datasets[0].points[pointIndex * 2];
 
-      this.removeInfoBubble();
+      this.removeInfoLine();
       var group = createSvgNode('g', {
         'id': 'bubble',
       });
@@ -664,29 +675,71 @@ class Chart {
           'stroke': d.color,
         }));
 
+      });    
+    
+      var createEl = (parent, tag, className, styles) => {
+        let el = document.createElement(tag);
+        el.className = className;
+        if (styles) {
+          for (var i in styles) {
+            el.style[i] = styles[i];
+          }
+        }
+        if (parent) {
+          parent.appendChild(el);
+        }
+        return el;
+      }
+    
+    var b = document.querySelector('.bubble');
+    if (!b) {
+      console.log('cREATE', b)
+      b = createEl(document.querySelector('.square'), 'div', 'bubble');
+      createEl(b, 'div', 'bubble--date');
+      createEl(b, 'div', 'bubble--content');
+    }
+
+    var d = document.querySelector('.bubble--date');
+    d.innerText = this.formatTime(this.xAxis[pointIndex]);
+
+    var c =  document.querySelector('.bubble--content');
+    c.innerHTML = '';
+
+    this.datasets.forEach(dataset => {
+      var d = createEl(c, 'div', 'bubble--dataset', {
+        color: dataset.color
       });
+      createEl(d, 'strong').innerText = this.formatValue(dataset.data[pointIndex]);
+      createEl(d, 'span').innerText = dataset.name;
+    });
+    
+    var offset = this.viewWidthPt * this.viewOffset / this.viewWidth;
+    var pointViewRelativePos = (pointIndex * this.pointOffset - offset) * 100 / this.viewWidthPt;
 
-      group.appendChild(createSvgNode('rect', {
-        'x': x-30,
-        'y': 1,
-        'rx': 5,
-        'ry': 5,
-        'fill': '#fff',
-        'stroke-width': 2,
-        'stroke': '#cecece',
-        'width': 100,
-        'height': 60
-      }));
+    
+    b.style.opacity = 1;
 
+    var w = b.offsetWidth/chart.offsetWidth * 100;
+    var left = Math.max(0, pointViewRelativePos - w / 2);
+    left = Math.min(left, 100 - w);
+    b.style.left = left + '%';
 
     }, false);
   }
 
-  removeInfoBubble() {
+  removeInfoLine() {
     var dl = svg.querySelector('#bubble');
     if (dl) {
       dl.parentElement.removeChild(dl);
     }
+  }
+
+  removeInfoBubble() {
+    var b = document.querySelector('.bubble');
+    if (b) {
+      b.parentElement.removeChild(b);
+    }
+    this.removeInfoLine();  
   }
 }
 

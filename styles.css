@@ -1,5 +1,5 @@
 body {
-  font: 13px/18px Tahoma,sans-serif,Arial,Helvetica;
+  font: 13px/18px 'Open Sans',"Lucida Grande","Lucida Sans Unicode",Tahoma, Arial,Helvetica,Verdana,sans-serif
 }
 html {
   
@@ -271,6 +271,47 @@ label.check {
 
 }
 
+.bubble {
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  transition: left 0.2s, opacity 0.1s;
+  padding: 2% 3%;
+  box-shadow: 1px 1px 3px 0px #999;
+  border-radius: 0.3rem;
+  background: #fff;
+  box-sizing: border-box;
+  z-index: 5;
+}
+
+.bubble--date {
+  font-size: 3.5vw;
+  white-space: nowrap;
+  /* padding-bottom: 1.5vw; */
+  padding-bottom: 0.3rem;
+  color: #222;
+}
+
+.bubble--content {
+  display: flex;
+  flex-flow: row;
+  justify-content: space-between;
+}
+
+.bubble--content .bubble--dataset:last-child {
+  padding-right: 0;
+}
+
+.bubble--dataset {
+  padding-right: 5vw;
+}
+
+.bubble--dataset strong {
+  display: block;
+  font-size: 4vw;
+  font-weight: bold;
+  padding-bottom: 1vw;
+}
 
 
 .xAxis {
