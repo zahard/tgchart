@@ -12,7 +12,7 @@ class Chart {
     this.prevMaxValue = 0;
 
     // Svg size in anstract points
-    this.viewHeightPt = 400;
+    this.viewHeightPt = 320;
     this.viewWidthPt = 400;
     // Distance between two points on chart
     this.pointOffset = 20;
@@ -515,7 +515,7 @@ class Chart {
   udpateRootOffset() {  
     var offset = this.viewWidthPt * this.viewOffset / this.viewWidth;
     //offset += 10;
-    this.svg.setAttribute('viewBox', `${offset} 0 400 400`);
+    this.svg.setAttribute('viewBox', `${offset} 0 400 320`);
   }
   
   
