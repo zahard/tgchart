@@ -83,18 +83,7 @@ function animateData(initData, targetData, id, duration) {
 
 
 function fitPath(data, maxValue, h, pointsOffset) {
-  var len = data.length;
-  var dx = 0;
-  var pathPoints = [];
-  for (let i = 0; i < len; i++) {
-    val = h * (1 - data[i] / maxValue);
-    
-    pathPoints.push(`L${dx} ${val}`);
-    dx += pointsOffset;
-  }
-
-  pathPoints[0] = pathPoints[0].replace('L', 'M');
-  return pathPoints.join(' ');
+  return buildPath(getPathPoints.apply(null, arguments));
 }
 
 function getPathPoints(data, maxValue, h, pointsOffset) {
@@ -107,6 +96,11 @@ function getPathPoints(data, maxValue, h, pointsOffset) {
     pathPoints.push(dx, val);
     dx += pointsOffset;
   }
+
+  //var strokeWidth = 5;
+  //pathPoints[0] += strokeWidth;
+  //pathPoints[(len-1) * 2] -= strokeWidth;
+
   return pathPoints;
 }
 
@@ -121,39 +115,6 @@ function buildPath(pathPoints) {
 }
 
 const svg = document.getElementById('svgroot');
-
-//var POINT_OFFSET = 20;
-
-
-//var graph = chartData[0];
-//var data = graph.columns[1].slice(1);
-
-//var totalMax = Math.max.apply(null, data);
-//var totalMin = Math.min.apply(null, data);
-//var max2Value = Math.max.apply(null, data2);
-//var totalMax = Math.max(max1Value, max2Value);
-
-//drawPath(svg, fitPath(data, totalMax, 400, POINT_OFFSET), '#f34c44', 3, 'data-1');
-//drawPath(svg, fitPath(data2,  totalMax, 400, POINT_OFFSET), '#3cc23f', 3, 'data-2');
-
-
-
-// Scale to median line
-function scaleToBaseValue(data, baseValue, scale) {
-  return data.map(function(val) {
-   return (val - baseValue) * scale + baseValue
-  });
-}
-
-function goUp() {
-  var scaled = new Array(data.length).fill(totalMax * 1.1);
-  animateData(data, scaled, 'data-1', 250);
-}
-
-function goDown() {
-  var scaled = new Array(data.length).fill(totalMax * 1.1);
-  animateData(scaled, data, 'data-1', 250);
-}
 
 
 

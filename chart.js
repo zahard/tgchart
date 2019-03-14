@@ -7,6 +7,7 @@ class Chart {
     
     this.monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 
       'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+     this.weekNames = ['Sun','Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
     this.prevMaxValue = 0;
 
@@ -455,7 +456,7 @@ class Chart {
   formatTime(datetime) {
     var date = new Date(datetime);
     return [
-      'Sat,',
+      this.weekNames[date.getDay()],
       this.monthNames[date.getMonth()],
       date.getDate()
     ].join(' ');
@@ -513,6 +514,7 @@ class Chart {
 
   udpateRootOffset() {  
     var offset = this.viewWidthPt * this.viewOffset / this.viewWidth;
+    //offset += 10;
     this.svg.setAttribute('viewBox', `${offset} 0 400 400`);
   }
   
@@ -643,8 +645,15 @@ class Chart {
 
       var b = this.frameBoundaryPoints();
       var pointPos = e.offsetX / chart.offsetWidth;
-      // console.log(point)
-      var pointIndex = b.first + Math.round((b.last - b.first) * pointPos);      
+      //var pointIndex = b.first + Math.round((b.last - b.first) * pointPos);
+      
+      var pointPercentPos =  this.viewOffset + this.viewWidth * pointPos;
+
+     
+      var pointIndex = Math.round((this.dataLen - 1)* pointPercentPos / 100);
+
+      console.log(pointPos, pointPercentPos, pointIndex)
+      
       var x = this.datasets[0].points[pointIndex * 2];
 
       this.removeInfoLine();
@@ -669,7 +678,7 @@ class Chart {
         group.appendChild(createSvgNode('circle', {
           'cx': cx,
           'cy': cy,
-          'r': 5,
+          'r': 4,
           'fill': '#fff',
           'stroke-width': 2,
           'stroke': d.color,
@@ -743,7 +752,7 @@ class Chart {
   }
 }
 
-var chart = new Chart(document.getElementById('svgroot'), chartData[0]);
+var chart = new Chart(document.getElementById('svgroot'), chartData[2]);
 
 function dr(v) {
   v = v || 41.3;
