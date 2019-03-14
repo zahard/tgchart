@@ -1,5 +1,6 @@
+import { fitPath, buildPath, createSvgNode, drawPath, getPathPoints } from './domHelpers.js';
 
-class Chart {
+export default class Chart {
   constructor (svgEl, graph) {
     this.svg = svgEl;
     this.datasetsSelect = document.querySelector('.datasets');
@@ -745,7 +746,7 @@ class Chart {
   }
 
   removeInfoLine() {
-    var dl = svg.querySelector('#bubble');
+    var dl = this.svg.querySelector('#bubble');
     if (dl) {
       dl.parentElement.removeChild(dl);
     }
@@ -761,11 +762,11 @@ class Chart {
   }
 }
 
-var chart = new Chart(document.getElementById('svgroot'), chartData[0]);
-
-var cWrap = document.querySelector('.chart-wrap');
-var onResize = () => {
-  cWrap.style.fontSize = Math.round(cWrap.offsetWidth / 25) + 'px';
+function onResize() {
+  [].slice.apply(document.querySelectorAll('.chart-wrap'))
+    .forEach(el => {
+      el.style.fontSize = Math.round(el.offsetWidth / 25) + 'px';
+    });  
 };
 window.addEventListener('resize', onResize);
 onResize();
