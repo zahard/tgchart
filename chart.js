@@ -642,7 +642,7 @@ class Chart {
 
     var chart = document.querySelector('.content');
     chart.addEventListener("click", (e) => {
-
+      e.preventDefault();
       var b = this.frameBoundaryPoints();
       var pointPos = e.offsetX / chart.offsetWidth;
       //var pointIndex = b.first + Math.round((b.last - b.first) * pointPos);
@@ -752,7 +752,7 @@ class Chart {
   }
 }
 
-var chart = new Chart(document.getElementById('svgroot'), chartData[2]);
+var chart = new Chart(document.getElementById('svgroot'), chartData[0]);
 
 function dr(v) {
   v = v || 41.3;

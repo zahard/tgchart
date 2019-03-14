@@ -1,9 +1,17 @@
 body {
   font: 13px/18px 'Open Sans',"Lucida Grande","Lucida Sans Unicode",Tahoma, Arial,Helvetica,Verdana,sans-serif
+ 
 }
+
 html {
   
 }
+
+* { 
+   -webkit-backface-visibility:  hidden;
+     -webkit-tap-highlight-color:  transparent;
+}
+
 
 svg path {
   transition: opacity 0.3s;
@@ -83,16 +91,16 @@ svg path {
 .drag-point {
   box-sizing: border-box;
   /*border:2px solid orange;*/
-  width: 5vw;
+  width: 2.5rem;
   position: absolute;
   height: 100%;
-  right: -3vw;
+  right: -0.5rem;
   cursor: pointer;
   z-index: 3;
 }
 
 .area-right .drag-point {
-  left: -3vw;
+  left: -0.5rem;
   right: auto;
 }
 
@@ -235,6 +243,10 @@ label.check {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
+    width: 0;
+    height: 0;
+    border: none;
+    opacity: 0;
 }
 
 .check__box {
@@ -417,3 +429,6 @@ label.check {
   white-space: nowrap;
   position: relative;
 }
+
+
+

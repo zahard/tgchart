@@ -8,40 +8,42 @@
     <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
-    <h3>Followers</h3>
-    <div class="square">
-        <div class="content">
-            <svg width="100%" height="100%"  id="svgroot" viewbox="0 0 400 400"xmlns="http://www.w3.org/2000/svg">
-            </svg>
+    <div class="">
+        <h3>Followers</h3>
+        <div class="square">
+            <div class="content">
+                <svg width="100%" height="100%"  id="svgroot" viewbox="0 0 400 400"xmlns="http://www.w3.org/2000/svg">
+                </svg>
+            </div>
         </div>
-    </div>
 
-    <div class="xAxis">
-        
-    </div>
+        <div class="xAxis">
+            
+        </div>
 
-    <div class="controls">
-        <div class="area-cover area-left">
-            <div class="drag-point"></div>
+        <div class="controls">
+            <div class="area-cover area-left">
+                <div class="drag-point"></div>
+            </div>
+            <div class="area-focused">
+                <div></div>
+            </div>
+            <div class="area-focused-drag"></div>
+            <div class="area-cover area-right">
+                <div class="drag-point"></div>
+            </div>
+            <div class="preview">
+                <svg width="100%" height="100%"  id="svg-preview" viewbox="0 0 400 60" xmlns="http://www.w3.org/2000/svg"></svg>
+            </div>
         </div>
-        <div class="area-focused">
-            <div></div>
-        </div>
-        <div class="area-focused-drag"></div>
-        <div class="area-cover area-right">
-            <div class="drag-point"></div>
-        </div>
-        <div class="preview">
-            <svg width="100%" height="100%"  id="svg-preview" viewbox="0 0 400 60" xmlns="http://www.w3.org/2000/svg"></svg>
-        </div>
-    </div>
 
-    <div class="datasets"></div>
+        <div class="datasets"></div>
+
+    </div>
 
     <script src="chart_data.js"></script>
     <script src="app.js"></script>
     <script src="chart.js"></script>
     
-    <!--<script src="preview.js"></script>-->
 </body>
 </html>
