@@ -1,10 +1,12 @@
-import { fitPath, buildPath, createSvgNode, drawPath, getPathPoints } from './domHelpers.js';
+import { fitPath, buildPath, createSvgNode, createEl, createDiv, drawPath, getPathPoints, createSvg } from './domHelpers.js';
 
 export default class Chart {
-  constructor (svgEl, graph) {
-    this.svg = svgEl;
-    this.datasetsSelect = document.querySelector('.datasets');
-    this.xAxisWrap = document.querySelector('.xAxis');
+  constructor (parent, graph) {
+    this.domEl = parent;
+    this.buildHTML(this.domEl);
+    
+    this.datasetsSelect = this.domEl.querySelector('.datasets');
+    this.xAxisWrap = this.domEl.querySelector('.xAxis');
     
     this.monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 
       'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -24,6 +26,8 @@ export default class Chart {
     var pointPerView = this.viewWidthPt / this.pointOffset;
     this.viewWidth = 100 / (this.dataLen - 1) * pointPerView;
     this.viewOffset = 0;
+
+    this.udpateRootOffset();
 
     this.maxValue = Math.max.apply(null, this.datasets.map(d => d.max));
     this.minValue = Math.min.apply(null, this.datasets.map(d => d.min));
@@ -55,6 +59,26 @@ export default class Chart {
     this.maximizeViewScale();
 
     this.addChartDetails();
+  }
+
+  buildHTML(parent) {
+    
+    var s = createDiv(parent, 'square');
+    var c = createDiv(s, 'content');
+    this.svg = createSvg(c, true);
+
+    createDiv(parent, 'xAxis');
+
+    var preview = createDiv(parent, 'controls');
+    createDiv(createDiv(preview, 'area-cover area-left'), 'drag-point');
+    createDiv(createDiv(preview, 'area-focused'));
+    createDiv(preview, 'area-focused-drag');
+    createDiv(createDiv(preview, 'area-cover area-right'), 'drag-point');
+    var p = createDiv(preview, 'preview');
+    createSvg(p, false, '0 0 400 48');
+    
+    createDiv(parent, 'datasets');
+
   }
 
   parseGraphData(graph) {
@@ -279,7 +303,7 @@ export default class Chart {
 
   drawGrid() {
     var val, v,d,i;
-    var content = document.querySelector('.content');
+    var content = this.domEl.querySelector('.content');
 
     // Grid with correct values already exists
     if (content.querySelectorAll('.grid').length && this.prevMaxValue == this.maxValue) {
@@ -474,7 +498,7 @@ export default class Chart {
   drawPrivewBar() {
     var previewBarHeight = 48;
     var pointsOffset = this.viewWidthPt / (this.dataLen - 1);
-    const svgPreview = this.svgPreview = document.getElementById('svg-preview');
+    const svgPreview = this.svgPreview = this.domEl.querySelector('.preview svg');
     this.datasets.forEach((d, i) => {
       drawPath(svgPreview, 
         fitPath(d.data, this.maxValue, previewBarHeight, pointsOffset), 
@@ -485,10 +509,10 @@ export default class Chart {
     });
 
     this.preview = {
-      area_f: document.querySelector('.area-focused'),
-      area_drag: document.querySelector('.area-focused-drag'),
-      area_l: document.querySelector('.area-left'),
-      area_r: document.querySelector('.area-right'),
+      area_f: this.domEl.querySelector('.area-focused'),
+      area_drag: this.domEl.querySelector('.area-focused-drag'),
+      area_l: this.domEl.querySelector('.area-left'),
+      area_r: this.domEl.querySelector('.area-right'),
     };
 
     this.updateRange();
@@ -522,10 +546,10 @@ export default class Chart {
   
 
   addRangeListeners() {  
-    var container  = document.querySelector('.controls');
-    var dragItem  = document.querySelector('.area-focused-drag');
-    var expandLeft  = document.querySelector('.area-left .drag-point');
-    var expandRight  = document.querySelector('.area-right .drag-point');
+    var container  = this.domEl.querySelector('.controls');
+    var dragItem  = this.domEl.querySelector('.area-focused-drag');
+    var expandLeft  = this.domEl.querySelector('.area-left .drag-point');
+    var expandRight  = this.domEl.querySelector('.area-right .drag-point');
     
     var active = false;
     var currentX;
@@ -681,31 +705,17 @@ export default class Chart {
 
     });    
   
-    var createEl = (parent, tag, className, styles) => {
-      let el = document.createElement(tag);
-      el.className = className;
-      if (styles) {
-        for (var i in styles) {
-          el.style[i] = styles[i];
-        }
-      }
-      if (parent) {
-        parent.appendChild(el);
-      }
-      return el;
-    }
-    
-    var b = document.querySelector('.bubble');
+    var b = this.domEl.querySelector('.bubble');
     if (!b) {
-      b = createEl(document.querySelector('.square'), 'div', 'bubble');
+      b = createEl(this.domEl.querySelector('.square'), 'div', 'bubble');
       createEl(b, 'div', 'bubble--date');
       createEl(b, 'div', 'bubble--content');
     }
 
-    var d = document.querySelector('.bubble--date');
+    var d = this.domEl.querySelector('.bubble--date');
     d.innerText = this.formatTime(this.xAxis[pointIndex]);
 
-    var c =  document.querySelector('.bubble--content');
+    var c =  this.domEl.querySelector('.bubble--content');
     c.innerHTML = '';
 
     this.datasets.forEach(dataset => {
@@ -730,7 +740,7 @@ export default class Chart {
   } 
 
   addChartDetails() {
-    this.viewWrapper = document.querySelector('.content');
+    this.viewWrapper = this.domEl.querySelector('.content');
 
     this.viewWrapper.addEventListener("click", (e) => {
       e.preventDefault();
@@ -753,7 +763,7 @@ export default class Chart {
   }
 
   removeInfoBubble() {
-    var b = document.querySelector('.bubble');
+    var b = this.domEl.querySelector('.bubble');
     if (b) {
       b.parentElement.removeChild(b);
     }

@@ -1,7 +1,6 @@
 import Chart from './chart.js';
 
-console.log(Chart);
-
-new Chart(document.getElementById('svgroot'), chartData[0]);
+// Export ChArt class
+window.TgChart = Chart;
 
 

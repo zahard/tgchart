@@ -17,9 +17,17 @@ html {
      -webkit-tap-highlight-color:  transparent;
 }
 
+.page-wrap {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
 .chart-wrap {
   width: 350px;
   font-size: 16px;
+  margin: 1.5em;
 }
 
 h2 {
@@ -48,9 +56,16 @@ svg path {
   height: 100%;
   }
 
-  #svgroot {
+  .content svg {
     z-index: 1;
     position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+
+  .preview svg {
+    width: 100%;
+    height: 100%;
   }
 
 .controls {
@@ -232,8 +247,10 @@ svg path {
 
 
 .datasets {
-  margin-bottom: 0.75em;
+  padding-bottom: 1em;
+  overflow: hidden;
 }
+
 label.check {
   border: 0.1em solid #e6ecf1;
     height: 2.4em;
@@ -287,7 +304,7 @@ label.check {
 }
 
 .check__input:checked + .check__box {
-  background-image: url("data:image/svg+xml,%3Csvg id='svgroot' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' %3E%3Ccircle cx='12' cy='12' r='12' fill='none'/%3E%3Cpolyline points='6,13 10,17 18,9' fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' %3E%3Ccircle cx='12' cy='12' r='12' fill='none'/%3E%3Cpolyline points='6,13 10,17 18,9' fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2'/%3E%3C/svg%3E");
 }
 
 .check__input:checked + .check__box::after {
@@ -303,7 +320,7 @@ label.check {
   position: absolute;
   top: 0;
   transition: left 0.1s, opacity 0.1s;
-  padding: 0.8em 1.2em;
+  padding: 0.4em 1em;
   box-shadow: 1px 1px 3px 0px #999;
   border-radius: 0.3rem;
   background: #fff;
@@ -312,9 +329,9 @@ label.check {
 }
 
 .bubble--date {
-  font-size: 1.1em;
+  font-size: 1em;
   white-space: nowrap;
-  padding-bottom: 0.5em;
+  padding-bottom: 0.3em;
   color: #222;
 }
 
@@ -338,9 +355,8 @@ label.check {
 
 .bubble--dataset strong {
   display: block;
-  font-size: 1.4em;
+  font-size: 1.2em;
   font-weight: bold;
-  padding-bottom: 0.25em;
 }
 
 

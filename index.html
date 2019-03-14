@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-    <!--<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">-->
+    <title>Telegram Chart Contest</title>
     
     <link href="https://fonts.googleapis.com/css?family=Arimo" rel="stylesheet">
 
@@ -15,46 +14,22 @@
     <h2>Followers</h2>
 
     <div class="page-wrap">
-        <div class="chart-wrap">
-
-            <div class="square">
-                <div class="content">
-                    <svg width="100%" height="100%"  id="svgroot" viewbox="0 0 400 320" xmlns="http://www.w3.org/2000/svg"
-                        preserveAspectRatio="xMinYMin meet"
-                    >
-
-                    </svg>
-                </div>
-            </div>
-
-            <div class="xAxis">
-                
-            </div>
-
-            <div class="controls">
-                <div class="area-cover area-left">
-                    <div class="drag-point"></div>
-                </div>
-                <div class="area-focused">
-                    <div></div>
-                </div>
-                <div class="area-focused-drag"></div>
-                <div class="area-cover area-right">
-                    <div class="drag-point"></div>
-                </div>
-                <div class="preview">
-                    <svg width="100%" height="100%"  id="svg-preview" viewbox="0 0 400 48" xmlns="http://www.w3.org/2000/svg"></svg>
-                </div>
-            </div>
-
-            <div class="datasets"></div>
-
-        </div>
+        <div class="chart-wrap"></div>
+        <div class="chart-wrap"></div>
+        <div class="chart-wrap"></div>
+        <div class="chart-wrap"></div>
+        <div class="chart-wrap"></div>
     </div>
 
 
-    <script src="chart_data.js"></script>
     <script src="lib/tgchart.js"></script>
+    <script src="chart_data.js"></script>
+    <script>
+        var wrappers = document.querySelectorAll('.chart-wrap');
+        for (var i =0; i< wrappers.length; i++) {
+            new TgChart(wrappers[i], chartData[i]);
+        }
+    </script>
     
 </body>
 </html>

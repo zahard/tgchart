@@ -1,3 +1,41 @@
+
+export function createSvg(parent, stretch, offset) {
+  var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  parent.appendChild(svg);
+
+  svg.setAttribute('width', '100%');
+  svg.setAttribute('height', '100%');
+
+  if (stretch) {
+    svg.setAttribute('preserveAspectRatio', 'xMinYMin meet');
+  }
+  if (offset) {
+    svg.setAttribute('viewBox', offset);
+  }
+  
+  return svg;
+}
+
+export function createDiv(parent, className, styles) {
+  return createEl.call(null, parent, 'div', className, styles);
+}
+
+export function createEl(parent, tag, className, styles) {
+  var el = document.createElement(tag);
+  if (className) {
+    el.className = className;
+  }
+  if (styles) {
+    for (var i in styles) {
+      el.style[i] = styles[i];
+    }
+  }
+  if (parent) {
+    parent.appendChild(el);
+  }
+  return el;
+}
+
 export function createSvgNode(nodeName, attrs) {
   var node = document.createElementNS("http://www.w3.org/2000/svg", nodeName);
   for (var a in attrs) {
