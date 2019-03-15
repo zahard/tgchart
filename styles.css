@@ -359,7 +359,7 @@ label.check {
 }
 
 
-.xAxis {
+.tgchart_x-axis {
   width: 100%;
   overflow: hidden;
   position: relative;
@@ -369,87 +369,36 @@ label.check {
 
 
 @keyframes timehideleft {
-  0% {
-    opacity: 1;
-    left: 0;
-  }
-
-  100%  {
-    opacity: 0;
-    left: -10vw;
-  }
+  0%   { left: 0; }
+  100% { left: -2.5em; }
 }
+
 @keyframes timehideright {
-  0% {
-    opacity: 1;
-    left: 0;
-  }
-
-  100%  {
-    opacity: 0;
-    left: 15vw;
-  }
+  0%   { left: 0; }
+  100% { left: 3em; }
 }
 
-
-@keyframes timeshowleft {
-  0%  {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-  }
+@keyframes showelement {
+  0%    { opacity: 0; }
+  100%  { opacity: 1; }
 }
 
-@keyframes timeshowright {
-  0%  {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-  }
+@keyframes hideelement {
+  0%    { opacity: 1; }
+  100%  { opacity: 0; }
 }
 
-
-
-.timepoints {
+.tgchart__x-points {
   display: flex;
   flex-direction: row;
   justify-content: space-between; 
   position: absolute;
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
+  animation-name: showelement; 
 }
 
-
-.timepoints.right:not(.hidden) div {
-  animation-name: timeshowright; 
-}
-
-.timepoints.left:not(.hidden) div {
-  animation-name: timeshowleft; 
-}
-
-.timepoints.hidden.right div {
-  animation-name: timehideright; 
-}
-
-.timepoints.hidden.left div {
-  animation-name: timehideleft; 
-}
-
-
-.timepoints div:first-child,
-.timepoints div:last-child {
-  animation-name: none !important; 
-}
-
-.timepoints.hidden div:first-child,
-.timepoints.hidden div:last-child {
-  opacity: 0;
-}
-
-.timepoints div {
+.tgchart__x-points > div {
   animation-duration: 0.5s;
   animation-fill-mode: forwards;
   overflow: hidden;
@@ -461,6 +410,29 @@ label.check {
   line-height: 2.5em;
   white-space: nowrap;
   position: relative;
+  opacity: 1;
+}
+
+.tgchart__x-points--hidden {
+  animation-name: hideelement; 
+}
+
+.tgchart__x-points > div:first-child,
+.tgchart__x-points > div:last-child {
+  animation-name: none !important; 
+}
+
+.tgchart__x-points--hidden div:first-child,
+.tgchart__x-points--hidden div:last-child {
+  display: none;
+}
+
+.tgchart__x-points--anim-right div {
+  animation-name: timehideright; 
+}
+
+.tgchart__x-points--anim-left div {
+  animation-name: timehideleft; 
 }
 
 /* Dark Theme  */

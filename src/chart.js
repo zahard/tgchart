@@ -1,6 +1,8 @@
 import formatLongNumber from './formatLongNumber'
+import PreviewBar from './previewBar'
 import { drawYAxis } from './drawYAxis';
-import { drawXAxis, moveXAxis } from './drawXAxis';
+import XAxisScroller from './drawXAxis';
+
 
 import { 
   fitPath, 
@@ -20,7 +22,6 @@ export default class Chart {
     this.buildHTML(this.domEl);
     
     this.datasetsSelect = this.domEl.querySelector('.datasets');
-    this.xAxisWrap = this.domEl.querySelector('.xAxis');
     
     this.monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 
       'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -59,17 +60,13 @@ export default class Chart {
       this.drawDatasetCheckbox(d);
     });
     
-    //var median = Math.round((totalMax - totalMin) / 2  +  totalMin);
-
-    // Draw grid 
-    //this.drawGrid();
 
     // Draw preview bar
     this.drawPrivewBar();
 
-    // Draw X Axis
-    drawXAxis(this.xAxis, this.viewWidth);
-    moveXAxis(this.viewWidth, this.viewOffset);
+    this.xAxis = new XAxisScroller(this.xAxisEl, this.xAxisData);
+    this.xAxis.draw(this.viewWidth, this.viewOffset);
+    
 
     this.maximizeViewScale();
 
@@ -82,7 +79,7 @@ export default class Chart {
     var c = createDiv(s, 'tgchart__view');
     this.svg = createSvg(c, true);
 
-    createDiv(parent, 'xAxis');
+    this.xAxisEl = createDiv(parent, 'tgchart_x-axis');
 
     var preview = createDiv(parent, 'controls');
     createDiv(createDiv(preview, 'area-cover area-left'), 'drag-point');
@@ -104,8 +101,8 @@ export default class Chart {
       var type = graph.types[colId];
       switch (type) {
         case 'x':
-          this.xAxis = column.slice(1);
-          this.dataLen = this.xAxis.length;
+          this.xAxisData = column.slice(1);
+          this.dataLen = this.xAxisData.length;
           break;
 
         case 'line':
@@ -464,7 +461,7 @@ export default class Chart {
       this.updateRange();
       this.udpateRootOffset();
 
-      moveXAxis(this.viewWidth, this.viewOffset);
+      this.xAxis.update(this.viewWidth, this.viewOffset);
     }
 
     const onExpandLeft = () => {  
@@ -487,7 +484,7 @@ export default class Chart {
 
       this.scalePath();
 
-      drawXAxis(this.xAxis, this.viewWidth, 'left');
+      this.xAxis.draw(this.viewWidth, this.viewOffset,  'left');
     }
 
     const onExpandRight = () => {
@@ -497,7 +494,7 @@ export default class Chart {
       this.viewWidth = viewWidth;
       this.scalePath();
       
-      drawXAxis(this.xAxis, this.viewWidth, 'right');
+      this.xAxis.draw(this.viewWidth, this.viewOffset, 'right');
     }
 
     const dragEnd = (e) => {
@@ -566,7 +563,7 @@ export default class Chart {
     }
 
     var d = this.domEl.querySelector('.bubble--date');
-    d.innerText = this.formatTime(this.xAxis[pointIndex]);
+    d.innerText = this.formatTime(this.xAxisData[pointIndex]);
 
     var c =  this.domEl.querySelector('.bubble--content');
     c.innerHTML = '';
