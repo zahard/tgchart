@@ -60,10 +60,10 @@ export default class Chart {
       },
       dragStart: () => {
         //this.removeInfoBubble();
-        this.normalizeViewScale();
+        //this.normalizeViewScale();
       },
       dragMove: () => {
-        //this.maximizeViewScale(300);
+        this.maximizeViewScale(300);
       },
       dragEnd: () => {
         this.maximizeViewScale();
