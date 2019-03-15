@@ -1,4 +1,18 @@
-import { fitPath, buildPath, createSvgNode, createEl, createDiv, drawPath, getPathPoints, createSvg } from './domHelpers.js';
+import formatLongNumber from './formatLongNumber'
+import { drawYAxis } from './drawYAxis';
+import { drawXAxis, moveXAxis } from './drawXAxis';
+
+import { 
+  fitPath, 
+  buildPath, 
+  createSvgNode, 
+  createEl, 
+  createDiv, 
+  drawPath, 
+  getPathPoints, 
+  createSvg 
+} from './domHelpers';
+
 
 export default class Chart {
   constructor (parent, graph) {
@@ -48,13 +62,14 @@ export default class Chart {
     //var median = Math.round((totalMax - totalMin) / 2  +  totalMin);
 
     // Draw grid 
-    this.drawGrid();
+    //this.drawGrid();
 
     // Draw preview bar
     this.drawPrivewBar();
 
     // Draw X Axis
-    this.drawXAxisData();
+    drawXAxis(this.xAxis, this.viewWidth);
+    moveXAxis(this.viewWidth, this.viewOffset);
 
     this.maximizeViewScale();
 
@@ -63,8 +78,8 @@ export default class Chart {
 
   buildHTML(parent) {
     
-    var s = createDiv(parent, 'square');
-    var c = createDiv(s, 'content');
+    var s = createDiv(parent, 'tgchart__view-container');
+    var c = createDiv(s, 'tgchart__view');
     this.svg = createSvg(c, true);
 
     createDiv(parent, 'xAxis');
@@ -156,7 +171,7 @@ export default class Chart {
       }
     });
 
-    this.drawGrid();
+    drawYAxis(this.domEl.querySelector('.tgchart__view'), this.maxValue, this.prevMaxValue);
   }
 
   normalizeViewScale() {
@@ -275,188 +290,26 @@ export default class Chart {
 
 
   drawDatasetCheckbox(dataset) {
-    var c = document.createElement('input');
-    c.type = "checkbox";
-    c.checked = "true";
-    c.className = "check__input"
-    c.addEventListener('change', () => {
-      this.toggleDataset(dataset, c.checked);
+    const lbl = createEl(this.datasetsSelect, 'label', 'check');
+    
+    createEl(lbl, 'input', 'check__input', null, {
+      type: 'checkbox',
+      checked: true
+    }).addEventListener('change', (e) => {
+      this.toggleDataset(dataset, e.target.checked);
     });
-    
 
-    var l = document.createElement('label');
-    l.className = "check"
-    l.appendChild(c);
+    createEl(lbl, 'span' ,'check__box', {
+      backgroundColor: dataset.color,
+      borderColor: dataset.color
+    });
 
-    var s = document.createElement('span');
-    s.style.backgroundColor = dataset.color;
-    s.style.borderColor = dataset.color;
-    s.className = "check__box"
-    l.appendChild(s);
-
-    l.appendChild(document.createTextNode(dataset.name));
-
-    this.datasetsSelect.appendChild(l);
+    lbl.appendChild(document.createTextNode(dataset.name));
   }
 
-  drawGrid() {
-    var val, v,d,i;
-    var content = this.domEl.querySelector('.content');
-
-    // Grid with correct values already exists
-    if (content.querySelectorAll('.grid').length && this.prevMaxValue == this.maxValue) {
-      return;
-    }
-
-    var gridWrap = document.createElement('div');
-    var zeroExists = false;
-    for (i = 0;i <= 5; i++) {
-      val =  Math.floor(this.maxValue * i * 18/100);
-      val = this.formatValue(val);
-
-      if (val === 0) {
-        if (!zeroExists) {
-          zeroExists = true;  
-        } else {
-          val = '';
-        }
-      }
-      
-      v = document.createElement('div')
-      v.className = 'grid--value';
-      v.innerText = val;
-
-      d = document.createElement('div')
-      d.className = 'grid--line';
-      d.style.bottom = (i * 18) + '%';
-
-      d.appendChild(v);
-      gridWrap.appendChild(d)
-    }
-
-
-    var newGridClassName = 'grid';
-    
-
-    // If grid was already drawed
-    var oldGrids = content.querySelectorAll('.grid');
-    if (oldGrids && oldGrids.length) {
-      for (var i = 0; i < oldGrids.length - 1; i++) {
-        oldGrids[i].parentNode.removeChild(oldGrids[i]);
-      }
-      var oldGrid = oldGrids[oldGrids.length - 1];
-
-      var animationDirection = this.prevMaxValue > this.maxValue  ? 'up' : 'down'
-      oldGrid.className = 'grid fadeout-' + animationDirection;
-      newGridClassName = 'grid fadein-' + animationDirection;
-
-      setTimeout(() => {
-        if (oldGrid && oldGrid.parentNode) {
-         oldGrid.parentNode.removeChild(oldGrid);
-        }
-      }, 550);
-    }
-
-    gridWrap.className = newGridClassName;
-    content.appendChild(gridWrap);
-  }
-
-  formatValue(val) {
-    /**
-      4
-      5 12456  -> 12.4k
-      6 123456 -> 123k
-      7 1234567 -> 1.23m
-      8 12345679 -> 12.3m
-      9 123456790 -> 123m
-    */
-    var num = Math.floor(val);
-    var digitsCount = String(num).length;
-    if (digitsCount < 5) {
-      return num;
-    }
-    var tailLen =  digitsCount > 9 ? 0 : (9 - digitsCount) % 3;
-    var intLen = digitsCount > 9  ? 6 : digitsCount - (3-tailLen);
-    var scaled = (num / Math.pow(10, intLen)).toFixed(tailLen);
-    var literal = digitsCount < 7 ? 'k' : 'm';
-
-    return scaled + literal;
-  }
-
-  moveTimeAxis() {
-    var scale = 100 / this.viewWidth;
-    this.timepointsEl.style.width = scale * 100 + '%';
-    this.timepointsEl.style.left = '-' + this.viewOffset * scale + '%';
-  }
-
-  drawXAxisData(expandDir) {      
-    var spaces = this.dataLen - 1;
-    var scale = 100 / this.viewWidth;
-    
-    var minSpaces = Math.floor(scale * 4);
-    var maxSpaces = Math.ceil(scale * 5);
-    var mostSuitable;
-    var minDiff = Infinity;
   
-    for (var s = minSpaces; s <= maxSpaces; s++) {
-      var diff = Math.abs(Math.round(spaces / s) - (spaces/s));
-      if (diff < minDiff) {
-        mostSuitable = s;
-        minDiff = diff;
-      }
-    }
+  formatValue(val) {
 
-    var step = (this.dataLen-1) / mostSuitable;
-    var  visible = [0];
-    for (var i = 1; i < mostSuitable - 1; i++) {
-      visible.push(Math.round(i * step));
-    }
-    visible.push(this.dataLen - 1);
-    
-    var animationDir;
-    if (this.timepointsEl) {
-      var prevVisibleCount = this.timepointsEl.childElementCount;
-      if (prevVisibleCount === visible.length) {
-        this.moveTimeAxis();
-        return;
-      } else {
-
-        if (expandDir === 'right') {
-          animationDir = prevVisibleCount < visible.length ? 'right' : 'left';
-        } else {
-          animationDir = prevVisibleCount < visible.length ? 'left' : 'right';
-        }
-
-        var toRemove = this.xAxisWrap.querySelector('.timepoints.hidden');
-        if (toRemove) {
-          this.xAxisWrap.removeChild(toRemove);
-        }
-
-        this.timepointsEl.className = 'timepoints hidden ' + animationDir;
-
-        clearTimeout(this.removeHiddenTimePoint);
-        this.removeHiddenTimePoint = setTimeout(() => {
-          var toRemove = this.xAxisWrap.querySelector('.timepoints.hidden');
-          if (toRemove) {
-            this.xAxisWrap.removeChild(toRemove);
-          }
-        }, 600);
-      }
-    }
-
-    var timepointsEl = document.createElement('div');
-    timepointsEl.className = 'timepoints ' + animationDir;
-    visible.forEach(index => {
-      var timeNode = document.createElement('div');
-      timeNode.innerText = this.formatTimePoint(this.xAxis[index]);
-      timepointsEl.appendChild(timeNode);
-    });
-
-    
-    this.xAxisWrap.appendChild(timepointsEl);
-    this.timepointsEl = timepointsEl;
-
-    this.moveTimeAxis();
   }
 
   getVisibleTimepointsCount(pointVisible) {
@@ -610,7 +463,8 @@ export default class Chart {
       this.viewOffset = viewOffset;
       this.updateRange();
       this.udpateRootOffset();
-      this.moveTimeAxis();
+
+      moveXAxis(this.viewWidth, this.viewOffset);
     }
 
     const onExpandLeft = () => {  
@@ -633,7 +487,7 @@ export default class Chart {
 
       this.scalePath();
 
-      this.drawXAxisData('left');
+      drawXAxis(this.xAxis, this.viewWidth, 'left');
     }
 
     const onExpandRight = () => {
@@ -642,7 +496,8 @@ export default class Chart {
       viewWidth = Math.min(100 - this.viewOffset, viewWidth);
       this.viewWidth = viewWidth;
       this.scalePath();
-      this.drawXAxisData('right');
+      
+      drawXAxis(this.xAxis, this.viewWidth, 'right');
     }
 
     const dragEnd = (e) => {
@@ -705,7 +560,7 @@ export default class Chart {
   
     var b = this.domEl.querySelector('.bubble');
     if (!b) {
-      b = createEl(this.domEl.querySelector('.square'), 'div', 'bubble');
+      b = createEl(this.domEl.querySelector('.tgchart__view-container'), 'div', 'bubble');
       createEl(b, 'div', 'bubble--date');
       createEl(b, 'div', 'bubble--content');
     }
@@ -720,7 +575,7 @@ export default class Chart {
       var d = createEl(c, 'div', 'bubble--dataset', {
         color: dataset.color
       });
-      createEl(d, 'strong').innerText = this.formatValue(dataset.data[pointIndex]);
+      createEl(d, 'strong').innerText = formatLongNumber(dataset.data[pointIndex]);
       createEl(d, 'span').innerText = dataset.name;
     });
     
@@ -738,7 +593,7 @@ export default class Chart {
   } 
 
   addChartDetails() {
-    this.viewWrapper = this.domEl.querySelector('.content');
+    this.viewWrapper = this.domEl.querySelector('.tgchart__view');
 
     this.viewWrapper.addEventListener("click", (e) => {
       e.preventDefault();

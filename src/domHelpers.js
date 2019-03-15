@@ -20,19 +20,29 @@ export function createDiv(parent, className, styles) {
   return createEl.call(null, parent, 'div', className, styles);
 }
 
-export function createEl(parent, tag, className, styles) {
+export function createEl(parent, tag, className, styles, attrs) {
   var el = document.createElement(tag);
+  
   if (className) {
     el.className = className;
   }
+
   if (styles) {
     for (var i in styles) {
       el.style[i] = styles[i];
     }
   }
+
+  if (attrs) {
+    for (var i in attrs) {
+      el.setAttribute(i, attrs[i]);
+    }
+  }
+
   if (parent) {
     parent.appendChild(el);
   }
+
   return el;
 }
 
