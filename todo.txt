@@ -1,0 +1,5 @@
+-- Move view frame animation change
+-- event driven components
+-- page payout separate styles
+-- Handle mouseout of container while draggin view frame
+-- MOve to preview area by click
