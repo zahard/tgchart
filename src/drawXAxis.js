@@ -1,11 +1,22 @@
+import { createDiv } from './domHelpers';
+import { formatTimePoint } from './formating';
+
 export default class XAxisScroller {
   constructor(wrapEl, xAxisData) {
     this.wrapEl = wrapEl;
     this.data = xAxisData;
 
+    this.prevWidth = 0;
+    this.prevOffset = 0;
+
   }
 
-  draw(viewWidth, viewOffset, expandDir) {
+  update(viewWidth, viewOffset) {
+    if (viewWidth === this.prevWidth) {
+      this.updatePosition(viewWidth, viewOffset);
+      return;
+    }
+
     var maxDataIndex = this.data.length - 1;
 
     var spaces = maxDataIndex;
@@ -36,13 +47,14 @@ export default class XAxisScroller {
     if (this.pointsEl) {
       var prevVisibleCount = this.pointsEl.childElementCount;
       if (prevVisibleCount === visible.length) {
-        this.update(viewWidth, viewOffset);
+        this.updatePosition(viewWidth, viewOffset);
         return;
       } else {
-
-        if (expandDir === 'right') {
+        if (this.prevOffset === viewOffset) {
+          // Dragging right side of view frame
           animationDir = prevVisibleCount < visible.length ? 'right' : 'left';
         } else {
+          // Dragging left side of view frame
           animationDir = prevVisibleCount < visible.length ? 'left' : 'right';
         }
 
@@ -63,36 +75,21 @@ export default class XAxisScroller {
       }
     }
 
-    var pointsEl = document.createElement('div');
-    pointsEl.className = 'tgchart__x-points';
+    this.pointsEl = createDiv(this.wrapEl, 'tgchart__x-points');
     visible.forEach(index => {
-      var timeNode = document.createElement('div');
-      timeNode.innerText = formatTimePoint(this.data[index]);
-      pointsEl.appendChild(timeNode);
+      createDiv(this.pointsEl).innerText = formatTimePoint(this.data[index]);
     });
-    this.pointsEl = pointsEl;
     
-    this.wrapEl.appendChild(pointsEl);
-    
-    this.update(viewWidth, viewOffset);
+    this.updatePosition(viewWidth, viewOffset);
   }
 
-  update(viewWidth, viewOffset) {
+  updatePosition(viewWidth, viewOffset) {
     var scale = 100 / viewWidth;
     this.pointsEl.style.width = scale * 100 + '%';
     this.pointsEl.style.left = '-' + viewOffset * scale + '%';
+
+    this.prevWidth = viewWidth;
+    this.prevOffset = viewOffset;
   }
 }
-
-
-var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 
-      'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-function formatTimePoint(datetime) {
-  var date = new Date(datetime);
-  return [
-    monthNames[date.getMonth()],
-    date.getDate()
-  ].join(' ');
- }
 

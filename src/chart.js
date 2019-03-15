@@ -1,8 +1,7 @@
-import formatLongNumber from './formatLongNumber'
+import { formatLongNumber, formatDate } from './formating';
 import PreviewBar from './previewBar'
 import { drawYAxis } from './drawYAxis';
 import XAxisScroller from './drawXAxis';
-
 
 import { 
   fitPath, 
@@ -18,14 +17,30 @@ import {
 
 export default class Chart {
   constructor (parent, graph) {
+
+    this.events = {
+      listeners: {},
+      next(eventName, ...eventParams) {
+        if (this.listeners[eventName]) {
+          this.listeners[eventName].forEach(f => {
+            f.apply(this, eventParams)
+          });
+        }
+      },
+      subscribe(eventName, f) {
+        if (!this.listeners[eventName]) {
+          this.listeners[eventName] = [];
+        }
+         this.listeners[eventName].push(f);
+      }
+
+    }
+
     this.domEl = parent;
     this.buildHTML(this.domEl);
     
     this.datasetsSelect = this.domEl.querySelector('.datasets');
     
-    this.monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 
-      'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-     this.weekNames = ['Sun','Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
     this.prevMaxValue = 0;
 
@@ -64,12 +79,15 @@ export default class Chart {
     // Draw preview bar
     this.drawPrivewBar();
 
+
     this.xAxis = new XAxisScroller(this.xAxisEl, this.xAxisData);
-    this.xAxis.draw(this.viewWidth, this.viewOffset);
-    
+    this.events.subscribe('viewChange', (prev, current) => {
+      this.xAxis.update(this.viewWidth, this.viewOffset);
+    });
+     
+    this.setView(this.viewOffset, this.viewWidth);
 
     this.maximizeViewScale();
-
     this.addChartDetails();
   }
 
@@ -304,44 +322,6 @@ export default class Chart {
     lbl.appendChild(document.createTextNode(dataset.name));
   }
 
-  
-  formatValue(val) {
-
-  }
-
-  getVisibleTimepointsCount(pointVisible) {
-    if (pointVisible < 6) {
-      return pointVisible;
-    }
-    if (pointVisible % 4 === 0) {
-      return 4;
-    }
-    if (pointVisible % 5 === 0) {
-      return 5;
-    }
-    var diff4 = Math.abs(Math.floor(pointVisible/4) - (pointVisible / 4));
-    var diff5 = Math.abs(Math.floor(pointVisible/5) - (pointVisible / 5));
-
-    return (diff4 <= diff5) ? 4 : 5;
-    
-  }
-
-  formatTime(datetime) {
-    var date = new Date(datetime);
-    return [
-      this.weekNames[date.getDay()] + ',',
-      this.monthNames[date.getMonth()],
-      date.getDate()
-    ].join(' ');
-  }
-
-  formatTimePoint(datetime) {
-    var date = new Date(datetime);
-    return [
-      this.monthNames[date.getMonth()],
-      date.getDate()
-    ].join(' ');
-  }
 
   drawPrivewBar() {
     var previewBarHeight = 48;
@@ -368,7 +348,21 @@ export default class Chart {
     this.addRangeListeners();
   }
 
-  
+  setView(viewOffset, viewWidth) {
+    var prev = {
+      width: this.viewWidth,
+      offset: this.viewOffset,
+    };
+
+    this.viewOffset = viewOffset;
+    this.viewWidth = viewWidth; 
+
+    this.events.next('viewChange', prev, {
+      width: this.viewWidth,
+      offset: this.viewOffset,
+    });
+  }
+
   updateRange() {
     var width = this.viewWidth;
     var offset = this.viewOffset;
@@ -457,11 +451,11 @@ export default class Chart {
       var viewOffset = initialOffset + currentX / containerPointSize;
       viewOffset = Math.max(0, viewOffset);
       viewOffset = Math.min(100 - this.viewWidth, viewOffset);
-      this.viewOffset = viewOffset;
+      
+      this.setView(viewOffset, this.viewWidth);
+
       this.updateRange();
       this.udpateRootOffset();
-
-      this.xAxis.update(this.viewWidth, this.viewOffset);
     }
 
     const onExpandLeft = () => {  
@@ -479,22 +473,18 @@ export default class Chart {
         viewOffset = initialOffset + (initalWidth - viewWidth);
       }
 
-      this.viewOffset = viewOffset;
-      this.viewWidth = viewWidth;
-
+      this.setView(viewOffset, viewWidth);
+      
       this.scalePath();
-
-      this.xAxis.draw(this.viewWidth, this.viewOffset,  'left');
     }
 
     const onExpandRight = () => {
       var viewWidth = initalWidth + currentX / containerPointSize;
       viewWidth = Math.max(viewWidth, 10);
       viewWidth = Math.min(100 - this.viewOffset, viewWidth);
-      this.viewWidth = viewWidth;
+      this.setView(this.viewOffset, viewWidth);
+
       this.scalePath();
-      
-      this.xAxis.draw(this.viewWidth, this.viewOffset, 'right');
     }
 
     const dragEnd = (e) => {
@@ -563,7 +553,7 @@ export default class Chart {
     }
 
     var d = this.domEl.querySelector('.bubble--date');
-    d.innerText = this.formatTime(this.xAxisData[pointIndex]);
+    d.innerText = formatDate(this.xAxisData[pointIndex]);
 
     var c =  this.domEl.querySelector('.bubble--content');
     c.innerHTML = '';

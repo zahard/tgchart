@@ -1,4 +1,4 @@
-import formatLongNumber from './formatLongNumber'
+import { formatLongNumber } from './formating';
 import { createDiv } from './domHelpers';
 
 export function drawYAxis(container, maxValue, prevMax) {
