@@ -1,7 +1,7 @@
 import { formatLongNumber, formatDate } from './formating';
-import PreviewBar from './previewBar'
 import { drawYAxis } from './drawYAxis';
 import XAxisScroller from './drawXAxis';
+import PreviewBar from './previewBar'
 
 import { 
   fitPath, 
@@ -18,24 +18,6 @@ import {
 export default class Chart {
   constructor (parent, graph) {
 
-    this.events = {
-      listeners: {},
-      next(eventName, ...eventParams) {
-        if (this.listeners[eventName]) {
-          this.listeners[eventName].forEach(f => {
-            f.apply(this, eventParams)
-          });
-        }
-      },
-      subscribe(eventName, f) {
-        if (!this.listeners[eventName]) {
-          this.listeners[eventName] = [];
-        }
-         this.listeners[eventName].push(f);
-      }
-
-    }
-
     this.domEl = parent;
     this.buildHTML(this.domEl);
     
@@ -43,6 +25,7 @@ export default class Chart {
     
 
     this.prevMaxValue = 0;
+    
 
     // Svg size in anstract points
     this.viewHeightPt = 320;
@@ -54,41 +37,47 @@ export default class Chart {
     
     // Define view size and offset
     var pointPerView = this.viewWidthPt / this.pointOffset;
-    this.viewWidth = 100 / (this.dataLen - 1) * pointPerView;
-    this.viewOffset = 0;
+    
 
-    this.udpateRootOffset();
-
-    this.maxValue = Math.max.apply(null, this.datasets.map(d => d.max));
-    this.minValue = Math.min.apply(null, this.datasets.map(d => d.min));
-
+    var totalMaxValue = Math.max.apply(null, this.datasets.map(d => d.max));
+    
     this.datasets.forEach((d,i) => {
       // Draw dataset chart
       d.id = 'data-'+ i;
       drawPath(this.svg, 
-        fitPath(d.data, this.maxValue, this.viewHeightPt, this.pointOffset), 
+        fitPath(d.data, totalMaxValue, this.viewHeightPt, this.pointOffset), 
         d.color, 2, d.id);
-
-      d.points = getPathPoints(d.data, this.maxValue, this.viewHeightPt, this.pointOffset);
-
+      d.points = getPathPoints(d.data, totalMaxValue, this.viewHeightPt, this.pointOffset);
       // Insert dataset checkbox 
       this.drawDatasetCheckbox(d);
     });
     
-
-    // Draw preview bar
-    this.drawPrivewBar();
-
-
     this.xAxis = new XAxisScroller(this.xAxisEl, this.xAxisData);
-    this.events.subscribe('viewChange', (prev, current) => {
-      this.xAxis.update(this.viewWidth, this.viewOffset);
-    });
-     
-    this.setView(this.viewOffset, this.viewWidth);
 
+    this.previewBar = new PreviewBar(this.previewEl, this.datasets, totalMaxValue, pointPerView, {
+      viewboxChange: (width, offset) => {
+        this.setView(width, offset);
+      },
+      dragStart: () => {
+        //this.removeInfoBubble();
+        this.normalizeViewScale();
+      },
+      dragMove: () => {
+        //this.maximizeViewScale(300);
+      },
+      dragEnd: () => {
+        this.maximizeViewScale();
+      },
+      scale: () => {
+        //this.scalePath()
+      }
+    });
+    
+  
     this.maximizeViewScale();
+
     this.addChartDetails();
+
   }
 
   buildHTML(parent) {
@@ -99,14 +88,8 @@ export default class Chart {
 
     this.xAxisEl = createDiv(parent, 'tgchart_x-axis');
 
-    var preview = createDiv(parent, 'controls');
-    createDiv(createDiv(preview, 'area-cover area-left'), 'drag-point');
-    createDiv(createDiv(preview, 'area-focused'));
-    createDiv(preview, 'area-focused-drag');
-    createDiv(createDiv(preview, 'area-cover area-right'), 'drag-point');
-    var p = createDiv(preview, 'preview');
-    createSvg(p, false, '0 0 400 48');
-    
+    this.previewEl = createDiv(parent, 'tgchart__preview');
+
     createDiv(parent, 'datasets');
 
   }
@@ -156,7 +139,8 @@ export default class Chart {
     // Show / hide
     this.svg.querySelector('#' + dataset.id).style.opacity = visible ? 1 : 0;
 
-    
+    this.removeInfoBubble();
+    return;
     // Preview Bar
     var maxVisibleValue = Math.max.apply(null, this.datasets.map(d => d.visible ? d.max : 0));
     var previewBarHeight = 48;
@@ -168,7 +152,7 @@ export default class Chart {
       } else {
         path = '';
       }
-      this.udpatePath(path, 'preview-' + d.id, this.svgPreview); 
+      this.updatePath(path, 'preview-' + d.id, this.svgPreview); 
     });
 
     //this.removeInfoBubble();
@@ -204,20 +188,23 @@ export default class Chart {
 
   maximizeViewScale(animationDur) {
     var boundary = this.frameBoundaryPoints();
-    var maxValue = Math.max.apply(null, this.datasets.map(d => {
+    var newMaxValue = Math.max.apply(null, this.datasets.map(d => {
       if (!d.visible) {
         return 0;
       }
       return Math.max.apply(null, d.data.slice(boundary.first, boundary.last + 1));
     }));
 
+    if (newMaxValue === this.prevMaxValue) {
+      return;
+    }
     this.prevMaxValue = this.maxValue;
-    this.maxValue = maxValue;
+    this.maxValue = newMaxValue;
 
     this.redrawFrameView(animationDur);
   }
 
-  udpatePath(path, id, svg) {
+  updatePath(path, id, svg) {
     svg.querySelector('#' + id).setAttribute('d', path);
   }
 
@@ -231,20 +218,23 @@ export default class Chart {
         if (d.animation) {
           d.animation.cancelled = true;
         }
-        d.points = getPathPoints(d.data, this.maxValue, 
-          this.viewHeightPt, this.pointOffset);
+
+        d.points = getPathPoints(d.data, this.maxValue, this.viewHeightPt, this.pointOffset);
         
-        this.udpatePath(buildPath(d.points), d.id, this.svg);
+        this.updatePath(buildPath(d.points), d.id, this.svg);
+
+        //this.animate(d, points, 200)
+
       }
     });
 
-
-
-    this.updateRange();
     this.udpateRootOffset();
+    
   }
 
   animate(dataset, targetData, duration) {
+    //console.log('%c New Animation start ', 'color: #00ff00');
+
     var initData = dataset.points.slice();
 
     var start = Date.now();
@@ -259,7 +249,8 @@ export default class Chart {
 
     const animateStep = () => {
       if (animationControl.finished || animationControl.cancelled) {
-        return
+        //console.log('%c Animation interrupted after '+ (now - start) + ' ms', 'color: red');
+        return;
       }
 
       now = Date.now();
@@ -267,6 +258,7 @@ export default class Chart {
       timeElapsed += dt;
       start = now;
 
+      //console.log('E/D', timeElapsed, duration)
       var len = initData.length;
       var progress = Math.min(timeElapsed / duration, 1);
       var from, to;
@@ -279,7 +271,13 @@ export default class Chart {
         data[i+1] = (to - from) * progress + from;
       }
 
-      this.udpatePath(buildPath(data), dataset.id, this.svg);
+
+      if (dt === 0) {
+        //console.log('Skip initial state draw -> ', progress.toFixed(2));
+      } else {
+        //console.log('Update path -> ', progress.toFixed(2));
+        this.updatePath(buildPath(data), dataset.id, this.svg); 
+      }
 
       // Save current points to keep current chart position
       dataset.points = data;
@@ -287,6 +285,7 @@ export default class Chart {
       if (progress < 1) {
         requestAnimationFrame(animateStep);
       } else {
+        //console.log('%c Animation finished by time', 'color: yellow');
         animationControl.finished = true;
       }
     }
@@ -295,6 +294,7 @@ export default class Chart {
 
     // If there is not pending animation - cancel it
     if (dataset.animation && !dataset.animation.finished) {
+      //console.log('%c Cancel previous animation', 'color: orange');
       dataset.animation.cancelled = true;
     }
     
@@ -322,33 +322,7 @@ export default class Chart {
     lbl.appendChild(document.createTextNode(dataset.name));
   }
 
-
-  drawPrivewBar() {
-    var previewBarHeight = 48;
-    var pointsOffset = this.viewWidthPt / (this.dataLen - 1);
-    const svgPreview = this.svgPreview = this.domEl.querySelector('.preview svg');
-    this.datasets.forEach((d, i) => {
-      drawPath(svgPreview, 
-        fitPath(d.data, this.maxValue, previewBarHeight, pointsOffset), 
-        d.color, 
-        1, 
-        'preview-' + d.id
-      );
-    });
-
-    this.preview = {
-      area_f: this.domEl.querySelector('.area-focused'),
-      area_drag: this.domEl.querySelector('.area-focused-drag'),
-      area_l: this.domEl.querySelector('.area-left'),
-      area_r: this.domEl.querySelector('.area-right'),
-    };
-
-    this.updateRange();
-
-    this.addRangeListeners();
-  }
-
-  setView(viewOffset, viewWidth) {
+  setView(viewWidth, viewOffset) {
     var prev = {
       width: this.viewWidth,
       offset: this.viewOffset,
@@ -356,27 +330,17 @@ export default class Chart {
 
     this.viewOffset = viewOffset;
     this.viewWidth = viewWidth; 
-
-    this.events.next('viewChange', prev, {
-      width: this.viewWidth,
-      offset: this.viewOffset,
-    });
-  }
-
-  updateRange() {
-    var width = this.viewWidth;
-    var offset = this.viewOffset;
-
-    this.preview.area_l.style.width = offset + '%';
-
-    this.preview.area_f.style.width = width + '%';
-    this.preview.area_drag.style.width = width + '%';
-
-    this.preview.area_f.style.left = offset + '%';
-    this.preview.area_drag.style.left = offset + '%';
-
-    this.preview.area_r.style.left = (offset + width) + '%';
-    this.preview.area_r.style.width = (100 - (offset + width)) + '%';
+    if (this.maxValue && viewWidth !== prev.width) {
+      this.scalePath();
+    }
+    
+    // Update x axis values
+    this.xAxis.update(this.viewWidth, this.viewOffset);
+    
+    // Update scv offset  
+    this.udpateRootOffset();
+    
+    //console.log('New viewOffset', viewWidth, viewOffset);
   }
 
   udpateRootOffset() {  
@@ -385,123 +349,6 @@ export default class Chart {
     this.svg.setAttribute('viewBox', `${offset} 0 400 320`);
   }
   
-  
-
-  addRangeListeners() {  
-    var container  = this.domEl.querySelector('.controls');
-    var dragItem  = this.domEl.querySelector('.area-focused-drag');
-    var expandLeft  = this.domEl.querySelector('.area-left .drag-point');
-    var expandRight  = this.domEl.querySelector('.area-right .drag-point');
-    
-    var active = false;
-    var currentX;
-    var initialX;
-    var initalWidth;
-    var initialOffset;
-    var containerPointSize;
-    var onDrag = () => {};
-
-    const dragStart = (e) => {
-      if (e.target !== dragItem && e.target !== expandLeft && e.target !== expandRight) {
-        return
-      }
-      active = true;
-      initalWidth = this.viewWidth;
-      initialOffset = this.viewOffset;
-      containerPointSize = container.offsetWidth / 100;
-
-      if (e.type === "touchstart") {
-        initialX = e.touches[0].clientX;
-      } else {
-        initialX = e.clientX;
-      }
-
-      this.removeInfoBubble();
-      this.normalizeViewScale();
-
-      switch (e.target) {
-        case dragItem:
-          onDrag = onFrameDrag;    
-          break;
-        case expandLeft:
-          onDrag = onExpandLeft;
-          break;
-          case expandRight:
-          onDrag = onExpandRight;
-          break;
-      }
-
-      
-    }
-
-    const drag = (e) => {
-      if (!active) {
-        return;
-      }
-      e.preventDefault();
-      if (e.type === "touchmove") {
-        currentX = e.touches[0].clientX - initialX;
-      } else {
-        currentX = e.clientX - initialX;    
-      }
-      onDrag(currentX);
-    }
-
-    const onFrameDrag = (currentX) => {
-      var viewOffset = initialOffset + currentX / containerPointSize;
-      viewOffset = Math.max(0, viewOffset);
-      viewOffset = Math.min(100 - this.viewWidth, viewOffset);
-      
-      this.setView(viewOffset, this.viewWidth);
-
-      this.updateRange();
-      this.udpateRootOffset();
-    }
-
-    const onExpandLeft = () => {  
-      var dx = currentX / containerPointSize;
-
-      var viewOffset = initialOffset + dx;
-      if (viewOffset < 0) {
-        viewOffset = 0;
-        dx = viewOffset - initialOffset;
-      }
-
-      var viewWidth = initalWidth - dx;
-      if (viewWidth < 10) {
-        viewWidth = 10;
-        viewOffset = initialOffset + (initalWidth - viewWidth);
-      }
-
-      this.setView(viewOffset, viewWidth);
-      
-      this.scalePath();
-    }
-
-    const onExpandRight = () => {
-      var viewWidth = initalWidth + currentX / containerPointSize;
-      viewWidth = Math.max(viewWidth, 10);
-      viewWidth = Math.min(100 - this.viewOffset, viewWidth);
-      this.setView(this.viewOffset, viewWidth);
-
-      this.scalePath();
-    }
-
-    const dragEnd = (e) => {
-      active = false;
-      if (e.target === dragItem) {
-        //var initData = scaleToBaseValue(data, median, 0.7);
-        //animateData(initData, data,'data-1', 100);
-      }
-      this.maximizeViewScale();
-    }
-    container.addEventListener("touchstart", dragStart, false);
-    container.addEventListener("touchend", dragEnd, false);
-    container.addEventListener("touchmove", drag, false);
-    container.addEventListener("mousedown", dragStart, false);
-    container.addEventListener("mouseup", dragEnd, false);
-    container.addEventListener("mousemove", drag, false);
-  }
 
   viewTouched(offsetX) {
     var pointPos = offsetX / this.viewWrapper.offsetWidth;

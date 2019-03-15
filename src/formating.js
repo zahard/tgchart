@@ -27,7 +27,7 @@ var monthNames = [
 ];
 var dayNames = ['Sun','Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-export function formatTimePoint(datetime) {
+export function formatXAxisPoint(datetime) {
 var date = new Date(datetime);
   return [
     monthNames[date.getMonth()],

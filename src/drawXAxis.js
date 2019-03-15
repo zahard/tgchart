@@ -1,5 +1,5 @@
 import { createDiv } from './domHelpers';
-import { formatTimePoint } from './formating';
+import { formatXAxisPoint } from './formating';
 
 export default class XAxisScroller {
   constructor(wrapEl, xAxisData) {
@@ -77,7 +77,7 @@ export default class XAxisScroller {
 
     this.pointsEl = createDiv(this.wrapEl, 'tgchart__x-points');
     visible.forEach(index => {
-      createDiv(this.pointsEl).innerText = formatTimePoint(this.data[index]);
+      createDiv(this.pointsEl).innerText = formatXAxisPoint(this.data[index]);
     });
     
     this.updatePosition(viewWidth, viewOffset);
@@ -92,4 +92,3 @@ export default class XAxisScroller {
     this.prevOffset = viewOffset;
   }
 }
-

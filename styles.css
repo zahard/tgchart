@@ -64,16 +64,20 @@ svg path {
   height: 100%;
 }
 
-  .preview svg {
-    width: 100%;
-    height: 100%;
-  }
-
-.controls {
+.tgchart__preview {
   height: 3em;
   position: relative;
   margin-bottom: 0.75em;
   overflow: hidden;
+}
+
+.tgchart__preview > svg {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;    
 }
 
 .area-left {
@@ -139,15 +143,6 @@ svg path {
   right: -0.5em;
 }
 
-
-.preview {
-  position: absolute;
-  z-index: 1;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;    
-}
 
 @keyframes gridfadeoutup {
   0%  {
