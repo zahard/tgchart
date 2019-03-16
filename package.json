@@ -4,8 +4,8 @@
   "description": "Chart for Telegram developers contest",
   "main": "index.hmtl",
   "scripts": {
-    "build": "rollup src/index.js --file lib/tgchart.js --format iife",
-    "dev": "rollup src/index.js --file lib/tgchart.js --format iife -w"
+    "build": "rollup src/index.js --file tgchart.js --format iife",
+    "dev": "rollup src/index.js --file tgchart.js --format iife -w"
   },
   "repository": {
     "type": "git",
