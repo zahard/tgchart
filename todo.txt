@@ -1,5 +1,6 @@
--- Move view frame animation change
--- event driven components
--- page payout separate styles
--- Handle mouseout of container while draggin view frame
+[x] Move view frame animation change 
+[x] event driven components
+[x] page payout separate styles
+[x] Handle mouseout of container while draggin view frame
 -- MOve to preview area by click
+-- Precalc default view width

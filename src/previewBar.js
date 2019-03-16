@@ -1,11 +1,11 @@
-import { createDiv, createSvg, drawPath, fitPath } from './domHelpers';
+import { createDiv, createSvg, drawPath, fitPath, updatePath} from './domHelpers';
 
 const SVG_H = 48;
 const SVG_W = 400;
 
 export default class PreviewBar {
 
-  constructor(parentEl, datasets, maxValue, pointPerView, callbacks) {
+  constructor(parentEl, datasets, pointPerView, callbacks) {
     this.pointPerView = pointPerView;
     this.datasets = datasets;
     this.callbacks = callbacks; 
@@ -15,7 +15,7 @@ export default class PreviewBar {
 
     this.buildHtml(parentEl);
 
-    this.drawData(maxValue);
+    this.drawData();
 
     this.addListeners();
 
@@ -26,26 +26,41 @@ export default class PreviewBar {
   buildHtml(parentEl) {
     this.container = parentEl;
 
-    this.leftOverlay = createDiv(parentEl, 'area-cover area-left'),
-    this.leftDragPoint = createDiv(this.leftOverlay, 'drag-point');
+    this.leftOverlay = createDiv(parentEl, 'tgchart__area-cover tgchart__area-left'),
+    this.leftDragPoint = createDiv(this.leftOverlay, 'tgchart__drag-point');
 
-    this.viewFrame = createDiv(parentEl, 'area-focused-drag');
-    this.viewFrameBg = createDiv(parentEl, 'area-focused');
+    this.viewFrame = createDiv(parentEl, 'tgchart__area-focused-drag');
+    this.viewFrameBg = createDiv(parentEl, 'tgchart__area-focused');
     createDiv(this.viewFrameBg);
     
-    this.rightOverlay = createDiv(parentEl, 'area-cover area-right'),
-    this.rightDragPoint = createDiv(this.rightOverlay, 'drag-point');
+    this.rightOverlay = createDiv(parentEl, 'tgchart__area-cover tgchart__area-right'),
+    this.rightDragPoint = createDiv(this.rightOverlay, 'tgchart__drag-point');
 
     this.svg = createSvg(parentEl, false, [0, 0, SVG_W, SVG_H].join(' '));
 
   }
 
-  drawData(maxValue) {
+  drawData() {
+    var maxValue = this.getMaxAvailableValue();
     this.datasets.forEach(d => {
-      drawPath(this.svg, 
-        fitPath(d.data, maxValue, SVG_H, this.pointsOffset), d.color, 1, 'preview-' + d.id
-      );
+        var path = fitPath(d.data, maxValue, SVG_H, this.pointsOffset)
+        drawPath(this.svg, path, d.color, 1, 'preview-' + d.id);
     });
+  }
+
+  update() {
+    var maxValue = this.getMaxAvailableValue();
+    this.datasets.forEach(d => {
+      var path = '';
+      if (d.visible) {
+        path = fitPath(d.data, maxValue, SVG_H, this.pointsOffset);
+      }
+      updatePath(path, 'preview-' + d.id, this.svg);
+    });
+  }
+
+  getMaxAvailableValue() {
+    return Math.max.apply(null, this.datasets.map(d => d.visible ? d.max : 0));
   }
 
   setViewbox(width, offset) {
@@ -139,7 +154,6 @@ export default class PreviewBar {
       viewOffset = Math.min(100 - this.viewWidth, viewOffset);
       
       this.setViewbox(this.viewWidth, viewOffset);
-      this.emit('scale');
     }
 
     const onExpandLeft = () => {  
