@@ -1,0 +1,87 @@
+body {
+  font: 13px/18px Arimo, 'Open Sans',"Lucida Grande","Lucida Sans Unicode",Tahoma, Arial,Helvetica,Verdana,sans-serif;
+  position: relative;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.page-wrap {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.chart-wrap {
+  width: 350px;
+  font-size: 16px;
+  padding: 1.5em;
+}
+
+h2 {
+  font-size: 2rem;
+  color: #444;
+  padding-left: 16px
+}
+
+@media (min-width: 0px) and (max-width: 600px) {
+  .chart-wrap {
+    width: 100%;
+    padding: 0;
+    margin-bottom: 1em;
+  }
+
+  h2 {
+    font-size: 6vw;
+    color: #444;
+    text-align: center;
+  }
+}
+
+.theme-dark {
+  background: #242f3e;
+}
+
+.theme-dark h2 {
+  color: #fff;
+}
+
+
+.theme-switch {
+  text-align: center;
+  margin-top: 3.5rem;
+  margin-bottom: 2rem;
+}
+
+.theme-switch i {
+  font-style: normal;
+}
+
+.theme-switch .night {
+  display: none;
+}
+
+.theme-switch .day {
+  display: inline;
+}
+
+.theme-dark .theme-switch .night {
+  display: inline;
+}
+
+.theme-dark .theme-switch .day {
+  display: none;
+}
+
+.theme-switch button {
+  color: #36a8f1;
+  font-size: 1.2rem;
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  cursor: pointer;
+}

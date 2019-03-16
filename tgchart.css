@@ -1,43 +1,15 @@
-body {
-  font: 13px/18px Arimo, 'Open Sans',"Lucida Grande","Lucida Sans Unicode",Tahoma, Arial,Helvetica,Verdana,sans-serif;
-  position: relative;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
 
-}
-
-html {
-  
-}
-
-* { 
-   -webkit-backface-visibility:  hidden;
-     -webkit-tap-highlight-color:  transparent;
-}
-
-.page-wrap {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-}
-
-.chart-wrap {
-  width: 100%;
-  font-size: 16px;
-  padding: .5em;
-}
-
-h2 {
-  font-size: 1.4rem;
-  color: #444;
-  text-align: center;
-}
-
-svg path {
+.tgchart svg path {
   transition: opacity 0.3s;
+}
+
+.tgchart  {
+  background: #fff;
+  font: 13px/18px Arimo, 'Open Sans',"Lucida Grande","Lucida Sans Unicode",Tahoma, Arial,Helvetica,Verdana,sans-serif;
+}
+
+.tgchart * {
+  -webkit-tap-highlight-color:  transparent;
 }
 
 .tgchart__view-container {
@@ -80,19 +52,14 @@ svg path {
   height: 100%;    
 }
 
-.area-left {
-  left: 0;
-  width: 45%;
-}
-
-.area-cover {
+.tgchart__area-cover {
   z-index: 3;
-  background-color: rgba(220, 239, 255, 0.65);
+  background-color: rgba(233, 245, 255, 0.5);
   position: absolute;
   height: 100%;
 }
 
-.area-focused {
+.tgchart__area-focused {
   position: absolute;
   height: 100%;
   z-index: 0;
@@ -103,13 +70,13 @@ svg path {
   background: #c1d9ea;
 }
 
-.area-focused div {
+.tgchart__area-focused div {
   width: 100%;
   height: 100%;
   background: #fff;
 }
 
-.area-focused-drag {
+.tgchart__area-focused-drag {
   position: absolute;
   height: 100%;
   z-index: 2;
@@ -118,12 +85,7 @@ svg path {
   box-sizing: border-box;
 }
 
-.area-right {
-  left: 70%;
-  width: 30%;
-}
-
-.drag-point {
+.tgchart__drag-point {
   box-sizing: border-box;
   /*border:2px solid orange;*/
   width: 2.5em;
@@ -133,12 +95,22 @@ svg path {
   z-index: 3;
 }
 
-.area-right .drag-point {
+.tgchart__area-left {
+  left: 0;
+  width: 45%;
+}
+
+.tgchart__area-right {
+  left: 70%;
+  width: 30%;
+}
+
+.tgchart__area-right .tgchart__drag-point {
   left: -0.5em;
   right: auto;
 }
 
-.area-left .drag-point {
+.tgchart__area-left .tgchart__drag-point {
   left: auto;
   right: -0.5em;
 }
@@ -433,28 +405,25 @@ svg path {
 
 
 /* Dark Theme  */
-.theme-dark {
+
+.theme-dark .tgchart {
   background: #242f3e;
 }
 
-.theme-dark h2 {
-  color: #fff;
-}
-
-.theme-dark .grid--line {
+.theme-dark .tgchart__grid-line {
   border-color: #293544
 }
 
-.theme-dark .grid--value,
-.theme-dark .timepoints div {
+.theme-dark .tgchart__grid-value,
+.theme-dark .tgchart__x-points > div {
   color: #546778;  
 }
 
-.theme-dark .content svg line {
+.theme-dark .tgchart__view svg line {
   stroke: #546778;
 }
 
-.theme-dark .content svg circle {
+.theme-dark .tgchart__view svg circle {
   fill: #242f3e;
 }
 
@@ -467,60 +436,23 @@ svg path {
   color: #fff;
 }
 
-.theme-dark label.check {
+.theme-dark .tgc-checkbox {
   border-color: #344658;
   color: #fff;
 }
 
-.theme-dark .check__box::after {
+.theme-dark .tgc-checkbox__button::after {
   background: #242f3e;
 }
 
-.theme-dark .area-focused {
+.theme-dark .tgchart__area-focused {
   background: #40566b;
 }
 
-.theme-dark .area-focused > div {
+.theme-dark .tgchart__area-focused > div {
   background: #242f3e;
 }
 
-.theme-dark .area-cover {
+.theme-dark .tgchart__area-cover {
   background: rgba(31, 36, 42, 0.6)
-}
-
-/* Page */
-.theme-switch {
-  text-align: center;
-  margin-top: 5rem;
-  cursor: pointer;
-}
-
-.theme-switch i {
-  font-style: normal;
-}
-
-.theme-switch .night {
-  display: none;
-}
-
-.theme-switch .day {
-  display: inline;
-}
-
-.theme-dark .theme-switch .night {
-  display: inline;
-}
-
-.theme-dark .theme-switch .day {
-  display: none;
-}
-
-.theme-switch button {
-  color: #36a8f1;
-  font-size: 1.2rem;
-  border: none;
-  background: none;
-  padding: 0;
-  margin: 0;
-  outline: none;
 }

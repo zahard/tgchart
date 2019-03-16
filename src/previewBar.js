@@ -26,15 +26,15 @@ export default class PreviewBar {
   buildHtml(parentEl) {
     this.container = parentEl;
 
-    this.leftOverlay = createDiv(parentEl, 'area-cover area-left'),
-    this.leftDragPoint = createDiv(this.leftOverlay, 'drag-point');
+    this.leftOverlay = createDiv(parentEl, 'tgchart__area-cover tgchart__area-left'),
+    this.leftDragPoint = createDiv(this.leftOverlay, 'tgchart__drag-point');
 
-    this.viewFrame = createDiv(parentEl, 'area-focused-drag');
-    this.viewFrameBg = createDiv(parentEl, 'area-focused');
+    this.viewFrame = createDiv(parentEl, 'tgchart__area-focused-drag');
+    this.viewFrameBg = createDiv(parentEl, 'tgchart__area-focused');
     createDiv(this.viewFrameBg);
     
-    this.rightOverlay = createDiv(parentEl, 'area-cover area-right'),
-    this.rightDragPoint = createDiv(this.rightOverlay, 'drag-point');
+    this.rightOverlay = createDiv(parentEl, 'tgchart__area-cover tgchart__area-right'),
+    this.rightDragPoint = createDiv(this.rightOverlay, 'tgchart__drag-point');
 
     this.svg = createSvg(parentEl, false, [0, 0, SVG_W, SVG_H].join(' '));
 
@@ -154,7 +154,6 @@ export default class PreviewBar {
       viewOffset = Math.min(100 - this.viewWidth, viewOffset);
       
       this.setViewbox(this.viewWidth, viewOffset);
-      this.emit('scale');
     }
 
     const onExpandLeft = () => {  
