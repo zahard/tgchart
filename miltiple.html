@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Telegram Chart Contest</title>    
+    <link href="https://fonts.googleapis.com/css?family=Arimo" rel="stylesheet">
+    <link rel="stylesheet" href="page.css"/>
+    <link rel="stylesheet" href="tgchart.css"/>
+</head>
+<body>
+    <h2>Followers</h2>
+    <div class="page-wrap">
+        <div class="chart-wrap"></div>
+        <div class="chart-wrap"></div>
+        <div class="chart-wrap"></div>
+        <div class="chart-wrap"></div>
+        <div class="chart-wrap"></div>
+    </div>
+    <div class="theme-switch">
+        <button>Switch to <i class="night">Day</i><i class="day">Night</i> Mode</button>
+    </div>
+    
+    <script src="lib/tgchart.js"></script>
+    <script src="chart_data.js"></script>
+    <script>
+        var wrappers = document.querySelectorAll('.chart-wrap');
+        var charts = [];
+
+        /*
+        var maxData = 38 + 2;
+        chartData[0].columns.forEach((col,i) => {
+            chartData[0].columns[i] = col.slice(0, maxData);
+        })*/
+
+        for (var i =0; i< wrappers.length; i++) {
+            charts.push(new TgChart(wrappers[i], chartData[i]));
+        }
+
+        document.querySelector('.theme-switch').addEventListener('click', function(){
+            var body = document.body;
+            var toggle = 'theme-dark';
+            body.className = body.className.indexOf(toggle) >= 0 ? '' : toggle;
+        });
+    </script>
+</body>
+</html>
