@@ -116,7 +116,6 @@ export default class PreviewBar {
         initialX = e.clientX;
       }
 
-      
       switch (e.target) {
         case dragItem:
           onDrag = onFrameDrag;    
@@ -128,10 +127,6 @@ export default class PreviewBar {
           onDrag = onExpandRight;
           break;
       }
-
-      this.emit('dragStart');
-
-      
     }
 
     const drag = (e) => {
@@ -145,7 +140,6 @@ export default class PreviewBar {
         currentX = e.clientX - initialX;    
       }
       onDrag(currentX);
-      this.emit('dragMove');
     }
 
     const onFrameDrag = (currentX) => {
@@ -172,7 +166,6 @@ export default class PreviewBar {
       }
 
       this.setViewbox(viewWidth, viewOffset);
-      this.emit('scale');
     }
 
     const onExpandRight = () => {
@@ -185,7 +178,6 @@ export default class PreviewBar {
 
     const dragEnd = (e) => {
       active = false;
-      this.emit('dragEnd');
     }
 
     container.addEventListener('mouseleave', () => {
@@ -200,8 +192,34 @@ export default class PreviewBar {
     container.addEventListener("mousedown", dragStart, false);
     container.addEventListener("mouseup", dragEnd, false);
     container.addEventListener("mousemove", drag, false);
+
+
+    this.rightOverlay.addEventListener("click", (e) => {
+      this.overlayClick(e);
+    });
+
+    this.leftOverlay.addEventListener("click", (e) => {
+      this.overlayClick(e);
+    });
+
   }
 
+  overlayClick(e) {
+    var el = e.target;
+    if (el.className.indexOf('tgchart__area-cover') === -1) {
+      return;
+    }
+    e.preventDefault();
+
+    var x = e.offsetX + el.offsetLeft;
+    var centerPoint = x / this.container.offsetWidth * 100;
+
+    var viewOffset = centerPoint - this.viewWidth / 2;
+    viewOffset = Math.max(0, viewOffset);
+    viewOffset = Math.min(100 - this.viewWidth, viewOffset);
+    this.setViewbox(this.viewWidth, viewOffset);
+  }
+  
   emit(eventName) {
     if (!this.callbacks[eventName]) {
       return;

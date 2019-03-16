@@ -46,15 +46,6 @@ export default class Chart {
     this.previewBar = new PreviewBar(this.previewEl, this.datasets, pointPerView, {
       viewboxChange: (width, offset) => {
         this.setView(width, offset);
-      },
-      dragStart: () => {
-        this.infoBubble.remove();
-      },
-      dragMove: () => {
-        this.maximizeViewScale(250);
-      },
-      dragEnd: () => {
-
       }
     });
 
@@ -327,13 +318,16 @@ export default class Chart {
 
     this.viewOffset = viewOffset;
     this.viewWidth = viewWidth; 
-    if (this.maxValue && viewWidth !== prev.width) {
-      this.scalePath();
+    if (this.maxValue) {
+      if (viewWidth !== prev.width) {
+        this.scalePath();
+      }
+      this.maximizeViewScale(250);  
     }
-    
+
     // Update x axis values
     this.xAxis.update(this.viewWidth, this.viewOffset);
-    
+  
     this.infoBubble.updateView(this.viewWidth, this.viewOffset);
 
     // Update scv offset  

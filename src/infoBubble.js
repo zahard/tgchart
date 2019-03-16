@@ -34,6 +34,9 @@ export default class InfoBubble {
 
     var pointPerView = this.viewWidth * (this.xAxisData.length - 1) / 100;
     this.pointOffset = this.viewWidthPt / pointPerView;
+
+    // Remove existing bubble when view changed
+    this.remove();
   }
 
   viewTouched(offsetX) {
@@ -120,10 +123,12 @@ export default class InfoBubble {
   }
 
   remove() {
-    if (this.bubbleEl) {
-      this.bubbleEl.parentElement.removeChild(this.bubbleEl);
-      this.bubbleEl = null;
+    if (!this.bubbleEl) {
+      return;
     }
+    this.bubbleEl.parentElement.removeChild(this.bubbleEl);
+    this.bubbleEl = null;
+  
     this.removeInfoLine();  
     this.activePointInfo = null;
   }
