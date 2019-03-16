@@ -1,11 +1,11 @@
-import { createDiv, createSvg, drawPath, fitPath } from './domHelpers';
+import { createDiv, createSvg, drawPath, fitPath, updatePath} from './domHelpers';
 
 const SVG_H = 48;
 const SVG_W = 400;
 
 export default class PreviewBar {
 
-  constructor(parentEl, datasets, maxValue, pointPerView, callbacks) {
+  constructor(parentEl, datasets, pointPerView, callbacks) {
     this.pointPerView = pointPerView;
     this.datasets = datasets;
     this.callbacks = callbacks; 
@@ -15,7 +15,7 @@ export default class PreviewBar {
 
     this.buildHtml(parentEl);
 
-    this.drawData(maxValue);
+    this.drawData();
 
     this.addListeners();
 
@@ -40,12 +40,27 @@ export default class PreviewBar {
 
   }
 
-  drawData(maxValue) {
+  drawData() {
+    var maxValue = this.getMaxAvailableValue();
     this.datasets.forEach(d => {
-      drawPath(this.svg, 
-        fitPath(d.data, maxValue, SVG_H, this.pointsOffset), d.color, 1, 'preview-' + d.id
-      );
+        var path = fitPath(d.data, maxValue, SVG_H, this.pointsOffset)
+        drawPath(this.svg, path, d.color, 1, 'preview-' + d.id);
     });
+  }
+
+  update() {
+    var maxValue = this.getMaxAvailableValue();
+    this.datasets.forEach(d => {
+      var path = '';
+      if (d.visible) {
+        path = fitPath(d.data, maxValue, SVG_H, this.pointsOffset);
+      }
+      updatePath(path, 'preview-' + d.id, this.svg);
+    });
+  }
+
+  getMaxAvailableValue() {
+    return Math.max.apply(null, this.datasets.map(d => d.visible ? d.max : 0));
   }
 
   setViewbox(width, offset) {

@@ -66,6 +66,10 @@ export function drawPath(el, path, color, lineWidth, id) {
   }));
 }
 
+export function updatePath(path, id, svg) {
+  svg.querySelector('#' + id).setAttribute('d', path);
+}
+
 export function fitPath(data, maxValue, h, pointsOffset) {
   return buildPath(getPathPoints.apply(null, arguments));
 }

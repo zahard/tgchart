@@ -240,12 +240,12 @@ svg path {
 }
 
 
-.datasets {
+.tgchart__datasets {
   padding-bottom: 1em;
   overflow: hidden;
 }
 
-label.check {
+.tgc-checkbox {
   border: 0.1em solid #e6ecf1;
     height: 2.4em;
     border-radius: 1.2em;
@@ -261,7 +261,7 @@ label.check {
     cursor: pointer;
 }
 
-.check__input {
+.tgc-checkbox__input {
   position: absolute;
   width: 0;
   height: 0;
@@ -271,7 +271,7 @@ label.check {
   left: 0;
 }
 
-.check__box {
+.tgc-checkbox__button {
   position: absolute;
   width: 1.6em;
   height: 1.6em;
@@ -281,7 +281,7 @@ label.check {
   background-image: none;
 }
 
-.check__box::after {
+.tgc-checkbox__button::after {
   content: '';
   position: absolute;
   background: #fff;
@@ -297,11 +297,11 @@ label.check {
   box-sizing: border-box;
 }
 
-.check__input:checked + .check__box {
+.tgc-checkbox__input:checked + .tgc-checkbox__button {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' %3E%3Ccircle cx='12' cy='12' r='12' fill='none'/%3E%3Cpolyline points='6,13 10,17 18,9' fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2'/%3E%3C/svg%3E");
 }
 
-.check__input:checked + .check__box::after {
+.tgc-checkbox__input:checked + .tgc-checkbox__button::after {
   height: 0;
   width: 0;
   top: 0.8em;
