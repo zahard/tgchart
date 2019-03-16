@@ -13,10 +13,6 @@
     <h2>Followers</h2>
     <div class="page-wrap">
         <div class="chart-wrap"></div>
-        <div class="chart-wrap"></div>
-        <div class="chart-wrap"></div>
-        <div class="chart-wrap"></div>
-        <div class="chart-wrap"></div>
     </div>
     <div class="theme-switch">
         <button>Switch to <i class="night">Day</i><i class="day">Night</i> Mode</button>
@@ -27,8 +23,15 @@
     <script>
         var wrappers = document.querySelectorAll('.chart-wrap');
         var charts = [];
+
+        /*
+        var maxData = 38 + 2;
+        chartData[0].columns.forEach((col,i) => {
+            chartData[0].columns[i] = col.slice(0, maxData);
+        })*/
+
         for (var i =0; i< wrappers.length; i++) {
-            charts.push(new TgChart(wrappers[i], chartData[i]));
+            charts.push(new TgChart(wrappers[i], chartData[0]));
         }
 
         document.querySelector('.theme-switch').addEventListener('click', function(){

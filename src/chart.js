@@ -29,7 +29,12 @@ export default class Chart {
     this.viewHeightPt = 320;
     this.viewWidthPt = 400;
 
-    var pointPerView = 20;
+    // Optimal value
+    var pointPerView = 20;    
+    var minViewIWidth = 10; // 10% of componentn width
+    var minimalPpv = Math.ceil(minViewIWidth / (100 * 1/(this.dataLen - 1)));
+    pointPerView = Math.max(pointPerView, minimalPpv);
+    pointPerView = Math.min(this.dataLen - 1, pointPerView);
 
     // Distance between two points on chart
     this.pointOffset = this.viewWidthPt / pointPerView;
