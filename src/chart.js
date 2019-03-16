@@ -22,6 +22,7 @@ export default class Chart {
     this.buildHTML(this.domEl);
 
     this.prevMaxValue = 0;
+    this.maxValue = 0;
     
     this.parseGraphData(graph);
 
@@ -51,7 +52,7 @@ export default class Chart {
 
     var maxValue = this.getViewMaxValue();
     this.setMaxValue(maxValue);
-
+    window.ccc = this
     this.datasets.forEach(d => {
       // Insert dataset checkbox 
       this.drawDatasetCheckbox(d);

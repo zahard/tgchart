@@ -176,10 +176,10 @@
 .tgchart__grid {
   animation-duration: 0.5s;
   animation-fill-mode: forwards;
-  z-index: 0;
   height: 100%;
   position: absolute;
   width: 100%;
+  z-index: 0;
 }
 
 .tgchart__grid--fadein-up {
@@ -199,13 +199,16 @@
 }
 
 .tgchart__grid-line {
-  z-index: 2;
   width: 100%;
   position: absolute;
   border-bottom: 0.1em solid #f2f4f5;
   height: 2em;
 }
+
 .tgchart__grid-value {
+  width: 100%;
+  position: absolute;
+  height: 2em;
   color: #9b9fa0;
   font-size: 1em;
   line-height: 2em;

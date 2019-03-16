@@ -1,6 +1,7 @@
 import { formatLongNumber } from './formating';
 import { createDiv } from './domHelpers';
 
+var removeTimeout = null;
 export function drawYAxis(container, maxValue, prevMax) {
     var yVal, v, d, i;
 
@@ -9,6 +10,8 @@ export function drawYAxis(container, maxValue, prevMax) {
     if (oldGrids.length && prevMax == maxValue) {
       return;
     }
+    
+    //console.log(maxValue, prevMax)
 
     var newGridClassName = 'tgchart__grid';
 
@@ -34,11 +37,18 @@ export function drawYAxis(container, maxValue, prevMax) {
     var gridWrap = createDiv(container, newGridClassName);
     var pointsCount = maxValue === 0 ? 1 : 6;
     for (i = 0; i < pointsCount; i++) {
-      yVal = formatLongNumber(Math.floor(maxValue * i * 18 / 100));
       d = createDiv(gridWrap, 'tgchart__grid-line', {
         bottom: (i * 18) + '%'
       });
-      createDiv(d, 'tgchart__grid-value').innerText = yVal;
     }
-
+    
+    var gridWrap = createDiv(container, newGridClassName);
+    gridWrap.style.zIndex = 2;
+    var pointsCount = maxValue === 0 ? 1 : 6;
+    for (i = 0; i < pointsCount; i++) {
+      yVal = formatLongNumber(Math.floor(maxValue * i * 18 / 100));
+      createDiv(gridWrap, 'tgchart__grid-value', {
+        bottom: (i * 18) + '%'
+      }).innerText = yVal;
+    }
   }
