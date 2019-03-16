@@ -20,18 +20,11 @@
     <script src="chart_data.js"></script>
     <script>
 
-        chartData[1].columns.pop();
-
         var wrappers = document.querySelectorAll('.chart-wrap');
         var charts = [];
         for (var i =0; i< wrappers.length; i++) {
-            charts.push(new TgChart(wrappers[i], chartData[1]));
+            charts.push(new TgChart(wrappers[i], chartData[0]));
         }
-
-        window.setChartOffset = (offset) => {
-            charts[0].setView(charts[0].viewWidth, offset);
-        }
-        window.chart = charts[0];
 
         document.querySelector('.theme-switch').addEventListener('click', function(){
             var body = document.body;

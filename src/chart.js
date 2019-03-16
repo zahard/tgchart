@@ -26,14 +26,15 @@ export default class Chart {
 
     this.prevMaxValue = 0;
     
+    this.parseGraphData(graph);
 
     // Svg size in anstract points
     this.viewHeightPt = 320;
     this.viewWidthPt = 400;
+    
     // Distance between two points on chart
     this.pointOffset = 20;
-
-    this.parseGraphData(graph);
+    console.log('20% deafault view');
     
     // Define view size and offset
     var pointPerView = this.viewWidthPt / this.pointOffset;
@@ -60,13 +61,13 @@ export default class Chart {
       },
       dragStart: () => {
         //this.removeInfoBubble();
-        this.normalizeViewScale();
+        //this.normalizeViewScale();
       },
       dragMove: () => {
-        //this.maximizeViewScale(300);
+        this.maximizeViewScale(250);
       },
       dragEnd: () => {
-        this.maximizeViewScale();
+        //this.maximizeViewScale();
       },
       scale: () => {
         //this.scalePath()
@@ -124,22 +125,36 @@ export default class Chart {
   }
 
   toggleDataset(dataset, visible) {
+    // Toggle visibility flag
     dataset.visible = visible;
 
-    this.maximizeViewScale();
+    var fillValue;
+    var futureMaxValue = this.getVisibleMaxValue();
 
-    // Hide animtion
     if (!visible) {
-      var finalValue = this.prevMaxValue >  this.maxValue ? 150 : 0;
+      // Hide animation
+      fillValue = this.maxValue  > futureMaxValue ? 150 : 0;
       var path = getPathPoints(new Array(this.dataLen)
-        .fill(finalValue), 100, this.viewHeightPt, this.pointOffset);
-      this.animate(dataset, path, 300)
+        .fill(fillValue), 100, this.viewHeightPt, this.pointOffset);
+      this.animate(dataset, path, 300);
+    } else {
+      // Update path of hidden dataset to appear from correct direction
+      fillValue = futureMaxValue >  this.maxValue ? 150 : 0;
+      dataset.points = getPathPoints(new Array(this.dataLen)
+        .fill(fillValue), 100, this.viewHeightPt, this.pointOffset);
     }
+
+    if (futureMaxValue !== this.maxValue) {
+      this.setMaxValue(futureMaxValue);
+    }
+
+    this.redrawFrameView();
+
 
     // Show / hide
     this.svg.querySelector('#' + dataset.id).style.opacity = visible ? 1 : 0;
 
-    this.removeInfoBubble();
+    // this.removeInfoBubble();
     return;
     // Preview Bar
     var maxVisibleValue = Math.max.apply(null, this.datasets.map(d => d.visible ? d.max : 0));
@@ -159,7 +174,12 @@ export default class Chart {
 
   }
 
-  
+  frameBoundaryPoints() {
+    return {
+      first: Math.floor(this.viewOffset / 100 * this.dataLen),
+      last: Math.floor((this.viewOffset + this.viewWidth) / 100 * this.dataLen)
+    };
+  }
 
   redrawFrameView(animationDur) {
     animationDur = animationDur || 300;
@@ -173,35 +193,35 @@ export default class Chart {
     drawYAxis(this.domEl.querySelector('.tgchart__view'), this.maxValue, this.prevMaxValue);
   }
 
-  normalizeViewScale() {
-    this.prevMaxValue = this.maxValue;
-    this.maxValue = Math.max.apply(null, this.datasets.map(d => d.visible ? d.max : 0));
-    this.redrawFrameView();
-  }
-
-  frameBoundaryPoints() {
-    return {
-      first: Math.floor(this.viewOffset / 100 * this.dataLen),
-      last: Math.floor((this.viewOffset + this.viewWidth) / 100 * this.dataLen)
-    };
+  normalizeViewScale(animationDur) {
+    var maxValue = Math.max.apply(null, this.datasets.map(d => d.visible ? d.max : 0));
+    this.setMaxValue(maxValue);
+    this.redrawFrameView(animationDur);
   }
 
   maximizeViewScale(animationDur) {
+    var newMaxValue = this.getVisibleMaxValue();
+    if (newMaxValue === this.maxValue) {
+      return;
+    }
+
+    this.setMaxValue(newMaxValue);
+    this.redrawFrameView(animationDur);
+  }
+
+  getVisibleMaxValue() {
     var boundary = this.frameBoundaryPoints();
-    var newMaxValue = Math.max.apply(null, this.datasets.map(d => {
+    return Math.max.apply(null, this.datasets.map(d => {
       if (!d.visible) {
         return 0;
       }
       return Math.max.apply(null, d.data.slice(boundary.first, boundary.last + 1));
     }));
+  }
 
-    if (newMaxValue === this.prevMaxValue) {
-      return;
-    }
+  setMaxValue(newMaxValue) {
     this.prevMaxValue = this.maxValue;
     this.maxValue = newMaxValue;
-
-    this.redrawFrameView(animationDur);
   }
 
   updatePath(path, id, svg) {

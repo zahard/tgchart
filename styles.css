@@ -320,6 +320,7 @@ label.check {
   background: #fff;
   box-sizing: border-box;
   z-index: 5;
+  line-height: 1.1;
 }
 
 .bubble--date {
