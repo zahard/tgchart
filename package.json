@@ -5,7 +5,8 @@
   "main": "index.hmtl",
   "scripts": {
     "build": "rollup src/index.js --file tgchart.js --format iife",
-    "dev": "rollup src/index.js --file tgchart.js --format iife -w"
+    "dev": "rollup src/index.js --file tgchart.js --format iife -w",
+    "compile": "npm run build && babel tgchart.js -o compiled.js --presets=@babel/preset-env"
   },
   "repository": {
     "type": "git",
@@ -18,6 +19,9 @@
   },
   "homepage": "https://github.com/zahard/tgchart#readme",
   "devDependencies": {
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.4.0",
+    "@babel/preset-env": "^7.4.0",
     "rollup": "^1.6.0"
   }
 }
