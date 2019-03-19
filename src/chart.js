@@ -3,6 +3,8 @@ import { drawYAxis } from './drawYAxis';
 import XAxisScroller from './drawXAxis';
 import PreviewBar from './previewBar'
 import InfoBubble from './infoBubble';
+import debounce from './debounce';
+import { animate } from './animate';
 
 import { 
   updatePath, 
@@ -52,7 +54,7 @@ export default class Chart {
 
     var maxValue = this.getViewMaxValue();
     this.setMaxValue(maxValue);
-    window.ccc = this
+
     this.datasets.forEach(d => {
       // Insert dataset checkbox 
       this.drawDatasetCheckbox(d);
@@ -62,6 +64,8 @@ export default class Chart {
     });
     
     this.redrawFrameView(100);
+
+    this.redrawDebounced = debounce(this.redrawFrameView.bind(this), 50);
   }
 
   buildHTML(parent) {
@@ -128,10 +132,12 @@ export default class Chart {
         .fill(fillValue), 100, this.viewHeightPt, this.pointOffset);
       this.animate(dataset, path, 300);
     } else {
-      // Update path of hidden dataset to appear from correct direction
-      fillValue = futureMaxValue >  this.maxValue ? 150 : 0;
-      dataset.points = getPathPoints(new Array(this.dataLen)
+      if (dataset.animation.finished) {
+        // Update path of hidden dataset to appear from correct direction
+        fillValue = futureMaxValue >  this.maxValue ? 150 : 0;
+        dataset.points = getPathPoints(new Array(this.dataLen)
         .fill(fillValue), 100, this.viewHeightPt, this.pointOffset);
+      }
     }
 
     if (futureMaxValue !== this.maxValue) {
@@ -164,7 +170,8 @@ export default class Chart {
       }
     });
 
-    drawYAxis(this.domEl.querySelector('.tgchart__view'), this.maxValue, this.prevMaxValue);
+    
+    drawYAxis(this.viewEl, this.maxValue, this.prevMaxValue);
   }
 
   normalizeViewScale(animationDur) {
@@ -173,14 +180,17 @@ export default class Chart {
     this.redrawFrameView(animationDur);
   }
 
-  maximizeViewScale(animationDur) {
+  maximizeViewScale() {
     var newMaxValue = this.getViewMaxValue();
     if (newMaxValue === this.maxValue) {
       return;
     }
 
     this.setMaxValue(newMaxValue);
-    this.redrawFrameView(animationDur);
+    
+    this.redrawDebounced(250);
+    //this.redrawFrameView(250);
+    
   }
 
   getViewMaxValue() {
@@ -222,37 +232,17 @@ export default class Chart {
   }
 
   animate(dataset, targetData, duration) {
-    //console.log('%c New Animation start ', 'color: #00ff00');
+    const initData = dataset.points.slice();
+    const len = initData.length;
 
-    var initData = dataset.points.slice();
-
-    var start = Date.now();
-    var timeElapsed = 0;
-    var dt;
-    var now; 
-
-    var animationControl = {
-      cancelled: false,
-      finished: false
-    };
-
-    const animateStep = () => {
-      if (animationControl.finished || animationControl.cancelled) {
-        //console.log('%c Animation interrupted after '+ (now - start) + ' ms', 'color: red');
-        return;
-      }
-
-      now = Date.now();
-      dt = now - start;
-      timeElapsed += dt;
-      start = now;
-
-      //console.log('E/D', timeElapsed, duration)
-      var len = initData.length;
-      var progress = Math.min(timeElapsed / duration, 1);
-      var from, to;
-      var data = [];
-
+    // If there is previous animation - cancel it
+    if (dataset.animation) {
+      dataset.animation.cancelled = true;
+    }
+    
+    dataset.animation = animate(duration, progress => {
+      let from, to;
+      const data = [];
       for (var i = 0; i < len; i +=2 ) {
         data[i] = initData[i]
         from = initData[i + 1];
@@ -260,48 +250,26 @@ export default class Chart {
         data[i+1] = (to - from) * progress + from;
       }
 
-
-      if (dt === 0) {
-        //console.log('Skip initial state draw -> ', progress.toFixed(2));
-      } else {
-        //console.log('Update path -> ', progress.toFixed(2));
-        updatePath(buildPath(data), dataset.id, this.svg); 
-      }
-
+      updatePath(buildPath(data), dataset.id, this.svg); 
+      
       // Save current points to keep current chart position
       dataset.points = data;
-
-      if (progress < 1) {
-        requestAnimationFrame(animateStep);
-      } else {
-        //console.log('%c Animation finished by time', 'color: yellow');
-        animationControl.finished = true;
-      }
-    }
-
-    animateStep();
-
-    // If there is not pending animation - cancel it
-    if (dataset.animation && !dataset.animation.finished) {
-      //console.log('%c Cancel previous animation', 'color: orange');
-      dataset.animation.cancelled = true;
-    }
-    
-    // Set updated animation object
-    dataset.animation = animationControl;
+    });
   }
-
-
 
   drawDatasetCheckbox(dataset) {
     const lbl = createEl(this.datasetsEl, 'label', 'tgc-checkbox');
 
-    createEl(lbl, 'input', 'tgc-checkbox__input', null, {
-      type: 'checkbox',
-      checked: true
-    }).addEventListener('change', (e) => {
+    const checkbox = createEl(lbl, 'input', 'tgc-checkbox__input', null, {
+      type: 'checkbox'
+    });
+    checkbox.addEventListener('change', (e) => {
       this.toggleDataset(dataset, e.target.checked);
     });
+
+    setTimeout(() => {
+      checkbox.checked = true;
+    }, 50);
 
     createEl(lbl, 'span' ,'tgc-checkbox__button', {
       backgroundColor: dataset.color,
@@ -323,7 +291,7 @@ export default class Chart {
       if (viewWidth !== prev.width) {
         this.scalePath();
       }
-      this.maximizeViewScale(250);  
+      this.maximizeViewScale();
     }
 
     // Update x axis values

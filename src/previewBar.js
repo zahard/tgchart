@@ -1,4 +1,5 @@
 import { createDiv, createSvg, drawPath, fitPath, updatePath} from './domHelpers';
+import { animateValue } from './animate';
 
 const SVG_H = 48;
 const SVG_W = 400;
@@ -182,9 +183,15 @@ export default class PreviewBar {
 
     container.addEventListener('mouseleave', () => {
       if (active) {
-        dragEnd();
+        //dragEnd();
       }
     }, false);
+    
+    document.body.addEventListener('mouseup', () => {
+      if (active) {
+        active = false;
+      }
+    });
 
     container.addEventListener("touchstart", dragStart, false);
     container.addEventListener("touchend", dragEnd, false);
@@ -217,7 +224,15 @@ export default class PreviewBar {
     var viewOffset = centerPoint - this.viewWidth / 2;
     viewOffset = Math.max(0, viewOffset);
     viewOffset = Math.min(100 - this.viewWidth, viewOffset);
-    this.setViewbox(this.viewWidth, viewOffset);
+    
+    if (this.moveFrameAnimation) {
+      this.moveFrameAnimation.cancelled = true;
+    }
+
+    this.moveFrameAnimation = animateValue(this.viewOffset, viewOffset, 100, offset => {
+      this.setViewbox(this.viewWidth, offset);
+    });
+
   }
   
   emit(eventName) {
