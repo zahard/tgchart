@@ -1,7 +1,18 @@
 import { formatLongNumber } from './formating';
-import { createDiv } from './domHelpers';
+import { createDiv, drawPath } from './domHelpers';
 
-var removeTimeout = null;
+export function drawGrid(svg, h, maxValue, prevMax) {
+  const pointsCount = maxValue === 0 ? 1 : 6;
+  const lineHeight = 1 / pointsCount;
+  let path, y, i;
+  for (i = 0; i < pointsCount; i++) {
+    y = h * (1 - lineHeight * i);
+    path = `M0 ${y} L1000 ${y}`;
+    drawPath(svg, path, '#fefefe', 1, '');
+  }
+
+}
+
 export function drawYAxis(container, maxValue, prevMax) {
     var yVal, v, d, i;
 

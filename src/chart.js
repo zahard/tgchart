@@ -1,5 +1,5 @@
 
-import { drawYAxis } from './drawYAxis';
+import { drawYAxis, drawGrid } from './drawYAxis';
 import XAxisScroller from './drawXAxis';
 import PreviewBar from './previewBar'
 import InfoBubble from './infoBubble';
@@ -63,6 +63,10 @@ export default class Chart {
       drawPath(this.svg, buildPath(d.points), d.color, 2, d.id);
     });
     
+
+    //Draw Grid
+    drawGrid(this.svg, this.viewHeightPt, this.maxValue, this.prevMaxValue)
+
     this.redrawFrameView(100);
 
     this.redrawDebounced = debounce(this.redrawFrameView.bind(this), 50);
@@ -171,7 +175,7 @@ export default class Chart {
     });
 
     
-    drawYAxis(this.viewEl, this.maxValue, this.prevMaxValue);
+    drawYAxis(this.viewEl, this.maxValue, this.prevMaxValue);    
   }
 
   normalizeViewScale(animationDur) {
