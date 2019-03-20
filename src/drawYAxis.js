@@ -1,14 +1,49 @@
 import { formatLongNumber } from './formating';
-import { createDiv, drawPath } from './domHelpers';
+import { createDiv, updatePath, createSvgNode, prependNode, createPath } from './domHelpers';
+import { animate } from './animate';
 
-export function drawGrid(svg, h, maxValue, prevMax) {
-  const pointsCount = maxValue === 0 ? 1 : 6;
-  const lineHeight = 1 / pointsCount;
-  let path, y, i;
-  for (i = 0; i < pointsCount; i++) {
-    y = h * (1 - lineHeight * i);
-    path = `M0 ${y} L1000 ${y}`;
-    drawPath(svg, path, '#fefefe', 1, '');
+export class ChartGrid {
+  constructor(svg, height) {
+    this.svg = svg;
+    this.height = height;
+    this.pointsCount = 6;
+  }
+
+  draw(maxValue) {
+    const lineHeight = 1 / pointsCount;
+    let path, y, i;
+
+    const group = createSvgNode('g');
+    for (i = 0; i < this.pointsCount; i++) {
+      //y = this.height * (1 - lineHeight * i);
+      y = this.height * (1 - 0.18 * i);
+      path = `M0 ${y} L1000 ${y}`;
+
+      group.appendChild(createPath(path, '#f2f4f5', 2, 'grid-' + i));
+    }
+    prependNode(this.svg, group);
+
+  }
+
+  update(maxValue, prevMax) {
+    if (!prevMax) {return}
+    let path, y, i, opacity;
+    animate(300, (progress) => {
+      for (i = 0; i < this.pointsCount; i++) {
+        let from = this.height * (1 - 0.18 * i);
+        let to = (from - this.height) * 2;
+        y = from + (to - from) * progress;
+
+        path = `M0 ${y} L1000 ${y}`;
+        updatePath(path, 'grid-' + i, this.svg);
+
+        opacity = 1 - progress;
+        if (opacity <= 0.5) {
+          this.svg.querySelector('#grid-' + i).setAttribute('stroke-opacity', opacity  * 2);  
+        }
+      }
+      console.log(opacity, opacity * 3);
+    });
   }
 
 }
@@ -48,9 +83,9 @@ export function drawYAxis(container, maxValue, prevMax) {
     var gridWrap = createDiv(container, newGridClassName);
     var pointsCount = maxValue === 0 ? 1 : 6;
     for (i = 0; i < pointsCount; i++) {
-      d = createDiv(gridWrap, 'tgchart__grid-line', {
-        bottom: (i * 18) + '%'
-      });
+      // d = createDiv(gridWrap, 'tgchart__grid-line', {
+      //   bottom: (i * 18) + '%'
+      // });
     }
     
     var gridWrap = createDiv(container, newGridClassName);

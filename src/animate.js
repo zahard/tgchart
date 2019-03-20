@@ -1,9 +1,9 @@
-export function animate(duration, stepFunc) {
+export function animate(duration, stepFunc, onFinish) {
   return animateValue.call(this, 0, 100, duration, function() {
     // Remove first arg
     const args = [].slice.call(arguments, 1);
     return stepFunc.apply(this, args);
-  });
+  }, onFinish);
 }
 
 export function animateValue(from, to, duration, stepFunc, onFinish) {

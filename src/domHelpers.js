@@ -54,6 +54,26 @@ export function createSvgNode(nodeName, attrs) {
   return node
 }
 
+export function createPath(path, color, lineWidth, id) {
+  return createSvgNode('path', {
+    'id': id,
+    'stroke': color,
+    'stroke-width': lineWidth,
+    'stroke-linejoin': 'round',
+    'stroke-linecap': 'round',
+    'fill': 'transparent',
+    'd': path
+  });
+}
+
+export function prependNode(parentNode, node) {
+  if (!parentNode.firstChild) {
+    parentNode.appendChild(node);
+  } else {
+    parentNode.insertBefore(node, parentNode.firstChild);
+  }
+}
+
 export function drawPath(el, path, color, lineWidth, id) {
   el.appendChild(createSvgNode('path', {
     'id': id,

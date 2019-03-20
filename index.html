@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="tgchart.css"/>
     <link href="favicon.ico" rel="shortcut icon" />
 </head>
-<body class="theme-dark">
+<body class="theme-dark1">
     <h2>Followers</h2>
     <div class="page-wrap">
         <div class="chart-wrap"></div>
@@ -24,12 +24,6 @@
     <script>
         var wrappers = document.querySelectorAll('.chart-wrap');
         var charts = [];
-
-        /*
-        var maxData = 38 + 2;
-        chartData[0].columns.forEach((col,i) => {
-            chartData[0].columns[i] = col.slice(0, maxData);
-        })*/
 
         for (var i =0; i< wrappers.length; i++) {
             charts.push(new TgChart(wrappers[i], chartData[0]));
