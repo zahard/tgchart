@@ -34,13 +34,13 @@ export default class XAxisScroller {
         minDiff = diff;
       }
     }
-
     var step = maxDataIndex / mostSuitable;
-    var  visible = [0];
+    var datesOffset = Math.round(step / 2);
+    var  visible = [datesOffset];
     for (var i = 1; i < mostSuitable - 1; i++) {
-      visible.push(Math.round(i * step));
+      visible.push(Math.round(i * step) + datesOffset);
     }
-    visible.push(maxDataIndex);
+    visible.push(maxDataIndex - datesOffset);
   
 
     var animationDir;
