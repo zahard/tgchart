@@ -326,7 +326,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }, onFinish);
   }
 
-  function animateValue(from, to, duration, stepFunc, onFinish) {
+  function animateValue(from, to, duration, stepFunc, onFinish, immediate) {
     var _this2 = this;
 
     var start = Date.now();
@@ -360,7 +360,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       }
     };
 
-    requestAnimationFrame(animateStep);
+    if (immediate) {
+      animateStep();
+    } else {
+      requestAnimationFrame(animateStep);
+    }
+
     return animationControl;
   }
 
@@ -775,6 +780,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       this.buildHTML(this.domEl);
       this.prevMaxValue = 0;
       this.maxValue = 0;
+      this.rootOffset = 0;
       this.parseGraphData(graph); // Svg size in anstract points
 
       this.viewHeightPt = 320;
@@ -1051,15 +1057,28 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }, {
       key: "udpateRootOffset",
       value: function udpateRootOffset() {
-        var offset = this.viewWidthPt * this.viewOffset / this.viewWidth; // var offsetWithPadding = offset;
-        // if (this.viewWidth < 99.99) {
-        //   var maxOffset = this.viewWidthPt * (100 - this.viewWidth) / this.viewWidth;
-        //   var padding = 10;
-        //   var maxRange = maxOffset + padding * 2;
-        //   offsetWithPadding = maxRange * (offset/maxOffset) - padding;
-        // }
+        var _this16 = this;
 
-        this.svg.setAttribute('viewBox', "".concat(offset, " 0 400 320"));
+        var offset = this.viewWidthPt * this.viewOffset / this.viewWidth;
+
+        if (offset === this.rootOffset) {
+          return;
+        } // Predictive set to 33% of progress and animation to the end
+
+
+        var offsetMomental = offset - (offset - this.rootOffset) * 0.4;
+        this.svg.setAttribute('viewBox', "".concat(offsetMomental, " 0 400 320"));
+        this.rootOffset = offsetMomental;
+
+        if (this.svgAnimation) {
+          this.svgAnimation.cancelled = true;
+        }
+
+        this.svgAnimation = animateValue(offsetMomental, offset, 200, function (value) {
+          _this16.svg.setAttribute('viewBox', "".concat(value, " 0 400 320"));
+
+          _this16.rootOffset = value;
+        });
       }
     }]);
 

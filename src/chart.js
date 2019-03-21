@@ -4,7 +4,7 @@ import XAxisScroller from './drawXAxis';
 import PreviewBar from './previewBar'
 import InfoBubble from './infoBubble';
 import debounce from './debounce';
-import { animate } from './animate';
+import { animate, animateValue} from './animate';
 
 import { 
   updatePath, 
@@ -25,6 +25,7 @@ export default class Chart {
 
     this.prevMaxValue = 0;
     this.maxValue = 0;
+    this.rootOffset = 0;
     
     this.parseGraphData(graph);
 
@@ -305,16 +306,27 @@ export default class Chart {
 
   udpateRootOffset() {  
     var offset = this.viewWidthPt * this.viewOffset / this.viewWidth;
-    // var offsetWithPadding = offset;
-    // if (this.viewWidth < 99.99) {
-    //   var maxOffset = this.viewWidthPt * (100 - this.viewWidth) / this.viewWidth;
-    //   var padding = 10;
-    //   var maxRange = maxOffset + padding * 2;
-    //   offsetWithPadding = maxRange * (offset/maxOffset) - padding;
-    // }
-    this.svg.setAttribute('viewBox', `${offset} 0 400 320`);
+
+    if (offset === this.rootOffset) {
+      return;
+    }
+
+    // Predictive set to 33% of progress and animation to the end
+    var offsetMomental = offset - (offset - this.rootOffset) * 0.4;
+
+    this.svg.setAttribute('viewBox', `${offsetMomental} 0 400 320`);
+    this.rootOffset = offsetMomental;
+    
+    if (this.svgAnimation) {
+      this.svgAnimation.cancelled = true;
+    }
+
+    this.svgAnimation = animateValue(offsetMomental, offset, 200, (value) => {
+      this.svg.setAttribute('viewBox', `${value} 0 400 320`);
+      this.rootOffset = value;
+    });
+
   }
-  
 
 }
 

@@ -6,7 +6,7 @@ export function animate(duration, stepFunc, onFinish) {
   }, onFinish);
 }
 
-export function animateValue(from, to, duration, stepFunc, onFinish) {
+export function animateValue(from, to, duration, stepFunc, onFinish, immediate) {
   const start = Date.now();
   let timeElapsed = 0;
   let progress = 0;
@@ -40,7 +40,12 @@ export function animateValue(from, to, duration, stepFunc, onFinish) {
       }
     }
   };
-  requestAnimationFrame(animateStep);
+
+  if (immediate) {
+    animateStep();
+  } else {
+    requestAnimationFrame(animateStep);
+  }
 
   return animationControl;
 }
