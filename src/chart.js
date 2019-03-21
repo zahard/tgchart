@@ -213,16 +213,11 @@ export default class Chart {
 
     this.datasets.forEach((d, i) => {
       if (d.visible) {
-        if (d.animation) {
-          d.animation.cancelled = true;
+        var newPoints = getPathPoints(d.data, this.maxValue, this.viewHeightPt, this.pointOffset);
+        for (var i=0; i < d.points.length; i += 2) {
+          d.points[i] = newPoints[i];
         }
-
-        d.points = getPathPoints(d.data, this.maxValue, this.viewHeightPt, this.pointOffset, 5);
-        
         updatePath(buildPath(d.points), d.id, this.svg);
-
-        //this.animate(d, points, 200)
-
       }
     });
 
@@ -243,7 +238,7 @@ export default class Chart {
       let from, to;
       const data = [];
       for (var i = 0; i < len; i +=2 ) {
-        data[i] = initData[i]
+        data[i] = dataset.points[i]
         from = initData[i + 1];
         to = targetData[i + 1];
         data[i+1] = (to - from) * progress + from;
@@ -287,10 +282,12 @@ export default class Chart {
     this.viewOffset = viewOffset;
     this.viewWidth = viewWidth; 
     if (this.maxValue) {
+      
       if (viewWidth !== prev.width) {
         this.scalePath();
       }
       this.maximizeViewScale();
+
     }
 
     // Update x axis values
