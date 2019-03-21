@@ -95,16 +95,19 @@ export function fitPath(data, maxValue, h, pointsOffset) {
 }
 
 export function getPathPoints(data, maxValue, h, pointsOffset) {
+  var halfPathWidth = 1;
   var len = data.length;
   var dx = 0;
   var pathPoints = [];
   var value;
   for (let i = 0; i < len; i++) {
     value = h * (1 - data[i] / maxValue);
-    
     pathPoints.push(dx, value);
     dx += pointsOffset;
   }
+  // Offset first and last pints to be visible
+  pathPoints[0] = halfPathWidth;
+  pathPoints[pathPoints.length - 2] -= halfPathWidth;
   return pathPoints;
 }
 

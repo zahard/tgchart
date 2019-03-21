@@ -1,4 +1,5 @@
- -  Smooth X scale
- -  Chart offset from sides
- -  Dates calculation offset (middle ones should be aligned)
+[x] Smooth X scale
+[x]  Chart offset from sides
+[x] Dates calculation offset (middle ones should be aligned)
 [x] Y axis animation issue
+ -  Scale animation

@@ -59,7 +59,7 @@ export default class Chart {
       // Insert dataset checkbox 
       this.drawDatasetCheckbox(d);
       // Initial path points (zero)
-      d.points = getPathPoints(new Array(this.dataLen).fill(0), 100, this.viewHeightPt, this.pointOffset);
+      d.points = getPathPoints(new Array(this.dataLen).fill(0), 100, this.viewHeightPt, this.pointOffset, 5);
       drawPath(this.svg, buildPath(d.points), d.color, 2, d.id);
     });
 
@@ -129,14 +129,14 @@ export default class Chart {
       // Hide animation
       fillValue = this.maxValue  > futureMaxValue ? 150 : 0;
       var path = getPathPoints(new Array(this.dataLen)
-        .fill(fillValue), 100, this.viewHeightPt, this.pointOffset);
+        .fill(fillValue), 100, this.viewHeightPt, this.pointOffset, 5);
       this.animate(dataset, path, 300);
     } else {
       if (dataset.animation.finished) {
         // Update path of hidden dataset to appear from correct direction
         fillValue = futureMaxValue >  this.maxValue ? 150 : 0;
         dataset.points = getPathPoints(new Array(this.dataLen)
-        .fill(fillValue), 100, this.viewHeightPt, this.pointOffset);
+        .fill(fillValue), 100, this.viewHeightPt, this.pointOffset, 5);
       }
     }
 
@@ -163,7 +163,7 @@ export default class Chart {
     animationDur = animationDur || 300;
     this.datasets.forEach(d => {
       if (d.visible) {
-        var path = getPathPoints(d.data, this.maxValue, this.viewHeightPt, this.pointOffset);
+        var path = getPathPoints(d.data, this.maxValue, this.viewHeightPt, this.pointOffset, 5);
         this.animate(d, path, animationDur);
       }
     });
@@ -216,7 +216,7 @@ export default class Chart {
           d.animation.cancelled = true;
         }
 
-        d.points = getPathPoints(d.data, this.maxValue, this.viewHeightPt, this.pointOffset);
+        d.points = getPathPoints(d.data, this.maxValue, this.viewHeightPt, this.pointOffset, 5);
         
         updatePath(buildPath(d.points), d.id, this.svg);
 
@@ -278,6 +278,7 @@ export default class Chart {
   }
 
   setView(viewWidth, viewOffset) {
+    console.log('New offset ->', viewOffset)
     var prev = {
       width: this.viewWidth,
       offset: this.viewOffset,
@@ -305,7 +306,13 @@ export default class Chart {
 
   udpateRootOffset() {  
     var offset = this.viewWidthPt * this.viewOffset / this.viewWidth;
-    //offset += 10;
+    // var offsetWithPadding = offset;
+    // if (this.viewWidth < 99.99) {
+    //   var maxOffset = this.viewWidthPt * (100 - this.viewWidth) / this.viewWidth;
+    //   var padding = 10;
+    //   var maxRange = maxOffset + padding * 2;
+    //   offsetWithPadding = maxRange * (offset/maxOffset) - padding;
+    // }
     this.svg.setAttribute('viewBox', `${offset} 0 400 320`);
   }
   

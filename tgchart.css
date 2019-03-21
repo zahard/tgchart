@@ -382,7 +382,8 @@
   position: absolute;
   animation-duration: 0.5s;
   animation-fill-mode: forwards;
-  animation-name: showelement; 
+  animation-name: showelement;
+  transition: left 0.1s;
 }
 
 .tgchart__x-points > div {
