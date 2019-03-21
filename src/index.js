@@ -1,6 +1,6 @@
 import Chart from './chart.js';
 
-// Export ChArt class
+// Export Chart class to global namespace
 window.TgChart = Chart;
 
 

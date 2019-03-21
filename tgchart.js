@@ -119,7 +119,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     svg.querySelector('#' + id).setAttribute('d', path);
   }
 
-  function fitPath(data, maxValue, h, pointsOffset) {
+  function fitPath() {
     return buildPath(getPathPoints.apply(null, arguments));
   }
 
@@ -277,8 +277,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
             this.updatePosition(viewWidth, viewOffset);
             return;
           } else {
-            console.log(prevVisibleCount, visible.length);
-
             if (this.prevOffset === viewOffset) {
               // Dragging right side of view frame
               animationDir = prevVisibleCount < visible.length ? 'right' : 'left';
@@ -1060,40 +1058,18 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         this.xAxis.update(this.viewWidth, this.viewOffset);
         this.infoBubble.updateView(this.viewWidth, this.viewOffset); // Update scv offset  
 
-        this.udpateRootOffset(); //console.log('New viewOffset', viewWidth, viewOffset);
+        this.udpateRootOffset();
       }
     }, {
       key: "udpateRootOffset",
       value: function udpateRootOffset() {
-        var _this16 = this;
-
         var offset = this.viewWidthPt * this.viewOffset / this.viewWidth;
         this.svg.setAttribute('viewBox', "".concat(offset, " 0 400 320"));
-        return;
-
-        if (offset === this.rootOffset) {
-          return;
-        } // Predictive set to 33% of progress and animation to the end
-
-
-        var offsetMomental = offset - (offset - this.rootOffset) * 0.2;
-        this.svg.setAttribute('viewBox', "".concat(offsetMomental, " 0 400 320"));
-        this.rootOffset = offsetMomental;
-
-        if (this.svgAnimation) {
-          this.svgAnimation.cancelled = true;
-        }
-
-        this.svgAnimation = animateValue(offsetMomental, offset, 100, function (value) {
-          _this16.svg.setAttribute('viewBox', "".concat(value, " 0 400 320"));
-
-          _this16.rootOffset = value;
-        });
       }
     }]);
 
     return Chart;
-  }(); // Export ChArt class
+  }(); // Export Chart class to global namespace
 
 
   window.TgChart = Chart;

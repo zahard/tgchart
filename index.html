@@ -8,13 +8,11 @@
     <link href="https://fonts.googleapis.com/css?family=Arimo" rel="stylesheet">
     <link rel="stylesheet" href="page.css"/>
     <link rel="stylesheet" href="tgchart.css"/>
-    <link href="favicon.ico" rel="shortcut icon" />
+    <link href="favicon.ico" rel="shortcut icon" />    
 </head>
 <body>
     <h2>Followers</h2>
-    <div class="page-wrap">
-        <div class="chart-wrap"></div>
-    </div>
+    <div class="page-wrap"></div>
     <div class="theme-switch">
         <button>Switch to <i class="night">Day</i><i class="day">Night</i> Mode</button>
     </div>
@@ -24,15 +22,26 @@
     <script>
         
         var charts = [];
-        var wrappers = document.querySelectorAll('.chart-wrap');
-        for (var i =0; i< wrappers.length; i++) {
-            charts.push(new TgChart(wrappers[i], chartData[i]));
+        var pageContainer = document.querySelector('.page-wrap');
+        var div;
+        for (var i =0; i< chartData.length; i++) {
+            div = document.createElement('div');
+            div.className = 'chart-wrap';
+            pageContainer.appendChild(div);
+            charts.push(new TgChart(div, chartData[i]));
         }
-        document.querySelector('.theme-switch').addEventListener('click', function(){
+
+        document.querySelector('.theme-switch').addEventListener('click', function() {
             var body = document.body;
             var toggle = 'theme-dark';
             body.className = body.className.indexOf(toggle) >= 0 ? '' : toggle;
         });
     </script>
+    <!--
+    Chart library for Telegram Dev Contest Demo page 
+    Author: Zakhar Portianov
+    Email: kkragy@gmail.com
+    Telegram: @zahardcore
+    -->
 </body>
 </html>

@@ -50,9 +50,6 @@ export default class XAxisScroller {
         this.updatePosition(viewWidth, viewOffset);
         return;
       } else {
-        
-        console.log(prevVisibleCount , visible.length)
-
         if (this.prevOffset === viewOffset) {
           // Dragging right side of view frame
           animationDir = prevVisibleCount < visible.length ? 'right' : 'left';
