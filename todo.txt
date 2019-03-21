@@ -1,6 +1,4 @@
-[x] Move view frame animation change 
-[x] event driven components
-[x] page payout separate styles
-[x] Handle mouseout of container while draggin view frame
--- MOve to preview area by click
--- Precalc default view width
+ -  Smooth X scale
+ -  Chart offset from sides
+ -  Dates calculation offset (middle ones should be aligned)
+[x] Y axis animation issue

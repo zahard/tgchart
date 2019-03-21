@@ -1,5 +1,5 @@
 
-import { drawYAxis, ChartGrid } from './drawYAxis';
+import { drawYAxis } from './drawYAxis';
 import XAxisScroller from './drawXAxis';
 import PreviewBar from './previewBar'
 import InfoBubble from './infoBubble';
@@ -62,13 +62,6 @@ export default class Chart {
       d.points = getPathPoints(new Array(this.dataLen).fill(0), 100, this.viewHeightPt, this.pointOffset);
       drawPath(this.svg, buildPath(d.points), d.color, 2, d.id);
     });
-    
-
-    //Draw Grid
-
-    this.yGrid = new ChartGrid(this.svg, this.viewHeightPt)
-    this.yGrid.draw();
-
 
     this.redrawFrameView(100);
 
@@ -147,9 +140,7 @@ export default class Chart {
       }
     }
 
-    if (futureMaxValue !== this.maxValue) {
-      this.setMaxValue(futureMaxValue);
-    }
+    this.setMaxValue(futureMaxValue);
 
     this.redrawFrameView();
 
@@ -179,9 +170,6 @@ export default class Chart {
 
     
     drawYAxis(this.viewEl, this.maxValue, this.prevMaxValue);
-    
-    this.yGrid.update(this.maxValue, this.prevMaxValue);
-
   }
 
   normalizeViewScale(animationDur) {

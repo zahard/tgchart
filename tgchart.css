@@ -182,6 +182,23 @@
   z-index: 0;
 }
 
+.tgchart__scale {
+
+}
+
+.tgchart__grid-lines {
+  height: 100%;
+  width: 100%;
+  position: relative;
+  position: absolute;
+}
+.tgchart__grid-values {
+  height: 100%;
+  width: 100%;
+  z-index: 2;
+  position: absolute;
+}
+
 .tgchart__grid--fadein-up {
   animation-name: gridfadeinup;
 }
@@ -206,7 +223,6 @@
 }
 
 .tgchart__grid-value {
-  width: 100%;
   position: absolute;
   height: 2em;
   color: #9b9fa0;
