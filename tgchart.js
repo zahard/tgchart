@@ -168,19 +168,24 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var newGridClassName = 'tgchart__grid'; // If grid was already drawed
 
     if (oldGrids && oldGrids.length) {
-      var existing = [];
-
-      for (i = 0; i < oldGrids.length; i++) {
-        if (i < 1) {
-          existing.push(oldGrids[i]);
-        } else {
-          oldGrids[i].parentNode.removeChild(oldGrids[i]);
-        }
-      }
-
       var animationDirection = prevMax > maxValue ? 'up' : 'down';
-      newGridClassName = 'tgchart__grid tgchart__grid--fadein-' + animationDirection;
-      existing.forEach(function (grid) {
+      newGridClassName = 'tgchart__grid tgchart__grid--fadein-' + animationDirection; // Leave One of a kind
+
+      var unique = [];
+      var selectors = ['.tgchart__grid-lines', '.tgchart__grid-values'];
+      selectors.forEach(function () {
+        var match = Array.from(container.querySelectorAll(selectors));
+
+        if (!match.length) {
+          return;
+        }
+
+        unique.push(match.shift());
+        match.forEach(function (el) {
+          return container.removeChild(el);
+        });
+      });
+      unique.forEach(function (grid) {
         grid.className = 'tgchart__grid tgchart__grid--fadeout-' + animationDirection;
       });
 
@@ -190,18 +195,18 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
       removeElTimeout = setTimeout(function () {
-        existing.forEach(function (grid) {
+        unique.forEach(function (grid) {
           if (grid && grid.parentNode) {
             grid.parentNode.removeChild(grid);
           }
         });
         removeElTimeout = null;
       }, 500);
-    }
+    } //var grid = createDiv(container, newGridClassName);
 
-    var grid = createDiv(container, newGridClassName);
-    var linesWrap = createDiv(grid, 'tgchart__grid-lines');
-    var valuesWrap = createDiv(grid, 'tgchart__grid-values');
+
+    var linesWrap = createDiv(container, 'tgchart__grid-lines ' + newGridClassName);
+    var valuesWrap = createDiv(container, 'tgchart__grid-values ' + newGridClassName);
     var pointsCount = maxValue === 0 ? 1 : 6;
 
     for (i = 0; i < pointsCount; i++) {
@@ -272,6 +277,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
             this.updatePosition(viewWidth, viewOffset);
             return;
           } else {
+            console.log(prevVisibleCount, visible.length);
+
             if (this.prevOffset === viewOffset) {
               // Dragging right side of view frame
               animationDir = prevVisibleCount < visible.length ? 'right' : 'left';
@@ -780,7 +787,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       this.buildHTML(this.domEl);
       this.prevMaxValue = 0;
       this.maxValue = 0;
-      this.rootOffset = 0;
+      this.rootOffset = -1;
       this.parseGraphData(graph); // Svg size in anstract points
 
       this.viewHeightPt = 320;
@@ -971,12 +978,13 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         this.pointOffset = 400 / pointPerView;
         this.datasets.forEach(function (d, i) {
           if (d.visible) {
-            if (d.animation) {
-              d.animation.cancelled = true;
+            var newPoints = getPathPoints(d.data, _this13.maxValue, _this13.viewHeightPt, _this13.pointOffset);
+
+            for (var i = 0; i < d.points.length; i += 2) {
+              d.points[i] = newPoints[i];
             }
 
-            d.points = getPathPoints(d.data, _this13.maxValue, _this13.viewHeightPt, _this13.pointOffset, 5);
-            updatePath(buildPath(d.points), d.id, _this13.svg); //this.animate(d, points, 200)
+            updatePath(buildPath(d.points), d.id, _this13.svg);
           }
         });
         this.udpateRootOffset();
@@ -998,7 +1006,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           var data = [];
 
           for (var i = 0; i < len; i += 2) {
-            data[i] = initData[i];
+            data[i] = dataset.points[i];
             from = initData[i + 1];
             to = targetData[i + 1];
             data[i + 1] = (to - from) * progress + from;
@@ -1060,13 +1068,15 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         var _this16 = this;
 
         var offset = this.viewWidthPt * this.viewOffset / this.viewWidth;
+        this.svg.setAttribute('viewBox', "".concat(offset, " 0 400 320"));
+        return;
 
         if (offset === this.rootOffset) {
           return;
         } // Predictive set to 33% of progress and animation to the end
 
 
-        var offsetMomental = offset - (offset - this.rootOffset) * 0.4;
+        var offsetMomental = offset - (offset - this.rootOffset) * 0.2;
         this.svg.setAttribute('viewBox', "".concat(offsetMomental, " 0 400 320"));
         this.rootOffset = offsetMomental;
 
@@ -1074,7 +1084,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           this.svgAnimation.cancelled = true;
         }
 
-        this.svgAnimation = animateValue(offsetMomental, offset, 200, function (value) {
+        this.svgAnimation = animateValue(offsetMomental, offset, 100, function (value) {
           _this16.svg.setAttribute('viewBox', "".concat(value, " 0 400 320"));
 
           _this16.rootOffset = value;

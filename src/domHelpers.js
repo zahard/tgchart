@@ -90,7 +90,7 @@ export function updatePath(path, id, svg) {
   svg.querySelector('#' + id).setAttribute('d', path);
 }
 
-export function fitPath(data, maxValue, h, pointsOffset) {
+export function fitPath() {
   return buildPath(getPathPoints.apply(null, arguments));
 }
 

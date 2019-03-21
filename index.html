@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Telegram Chart Contest</title>    
+    <title>Chart | Telegram Dev Contest</title>    
     <link href="https://fonts.googleapis.com/css?family=Arimo" rel="stylesheet">
     <link rel="stylesheet" href="page.css"/>
     <link rel="stylesheet" href="tgchart.css"/>
@@ -19,16 +19,15 @@
         <button>Switch to <i class="night">Day</i><i class="day">Night</i> Mode</button>
     </div>
     
-    <script src="compiled.js"></script>
+    <script src="tgchart.js"></script>
     <script src="chart_data.js"></script>
     <script>
-        var wrappers = document.querySelectorAll('.chart-wrap');
+        
         var charts = [];
-
+        var wrappers = document.querySelectorAll('.chart-wrap');
         for (var i =0; i< wrappers.length; i++) {
-            charts.push(new TgChart(wrappers[i], chartData[0]));
+            charts.push(new TgChart(wrappers[i], chartData[i]));
         }
-
         document.querySelector('.theme-switch').addEventListener('click', function(){
             var body = document.body;
             var toggle = 'theme-dark';

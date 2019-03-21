@@ -297,35 +297,11 @@ export default class Chart {
 
     // Update scv offset  
     this.udpateRootOffset();
-    
-    //console.log('New viewOffset', viewWidth, viewOffset);
   }
 
   udpateRootOffset() {  
     var offset = this.viewWidthPt * this.viewOffset / this.viewWidth;
-
     this.svg.setAttribute('viewBox', `${offset} 0 400 320`);
-    return;
-
-    if (offset === this.rootOffset) {
-      return;
-    }
-
-    // Predictive set to 33% of progress and animation to the end
-    var offsetMomental = offset - (offset - this.rootOffset) * 0.2;
-
-    this.svg.setAttribute('viewBox', `${offsetMomental} 0 400 320`);
-    this.rootOffset = offsetMomental;
-    
-    if (this.svgAnimation) {
-      this.svgAnimation.cancelled = true;
-    }
-
-    this.svgAnimation = animateValue(offsetMomental, offset, 100, (value) => {
-      this.svg.setAttribute('viewBox', `${value} 0 400 320`);
-      this.rootOffset = value;
-    });
-
   }
 
 }

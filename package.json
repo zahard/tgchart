@@ -4,9 +4,9 @@
   "description": "Chart for Telegram developers contest",
   "main": "index.hmtl",
   "scripts": {
-    "build": "rollup src/index.js --file tgchart.js --format iife",
-    "dev": "rollup src/index.js --file tgchart.js --format iife -w",
-    "compile": "npm run build && babel tgchart.js -o compiled.js --presets=@babel/preset-env"
+    "build": "rollup src/index.js --file build.js --format iife",
+    "dev": "rollup src/index.js --file build.js --format iife -w",
+    "compile": "npm run build && babel build.js -o tgchart.js --presets=@babel/preset-env"
   },
   "repository": {
     "type": "git",

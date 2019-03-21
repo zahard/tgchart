@@ -4,6 +4,7 @@
 }
 
 .tgchart  {
+  padding-top: 1.5em;
   background: #fff;
   font: 13px/18px Arimo, 'Open Sans',"Lucida Grande","Lucida Sans Unicode",Tahoma, Arial,Helvetica,Verdana,sans-serif;
 }
@@ -392,7 +393,7 @@
 }
 
 .tgchart__x-points--hidden {
-  animation-name: hideelement; 
+  animation-name: hideelement;
 }
 
 .tgchart__x-points > div:first-child,
