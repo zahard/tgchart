@@ -150,51 +150,62 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     return path.join(' ');
   }
 
+  var removeElTimeout;
+
   function drawYAxis(container, maxValue, prevMax) {
-    var yVal, d, i; // Grid with correct values already exists
+    var yVal, i; // Grid with correct values already exists
 
     var oldGrids = container.querySelectorAll('.tgchart__grid');
 
     if (oldGrids.length && prevMax == maxValue) {
       return;
-    } //console.log(maxValue, prevMax)
-
+    }
 
     var newGridClassName = 'tgchart__grid'; // If grid was already drawed
 
     if (oldGrids && oldGrids.length) {
-      for (i = 0; i < oldGrids.length - 1; i++) {
-        oldGrids[i].parentNode.removeChild(oldGrids[i]);
+      var existing = [];
+
+      for (i = 0; i < oldGrids.length; i++) {
+        if (i < 1) {
+          existing.push(oldGrids[i]);
+        } else {
+          oldGrids[i].parentNode.removeChild(oldGrids[i]);
+        }
       }
 
-      var oldGrid = oldGrids[oldGrids.length - 1];
       var animationDirection = prevMax > maxValue ? 'up' : 'down';
-      oldGrid.className = 'tgchart__grid tgchart__grid--fadeout-' + animationDirection;
-      newGridClassName = 'tgchart__grid tgchart__grid--fadein-' + animationDirection; // Remove used grid from DOM after animation
+      newGridClassName = 'tgchart__grid tgchart__grid--fadein-' + animationDirection;
+      existing.forEach(function (grid) {
+        grid.className = 'tgchart__grid tgchart__grid--fadeout-' + animationDirection;
+      });
 
-      setTimeout(function () {
-        if (oldGrid && oldGrid.parentNode) {
-          oldGrid.parentNode.removeChild(oldGrid);
-        }
+      if (removeElTimeout) {
+        clearTimeout(removeElTimeout);
+      } // Remove used grid from DOM after animation
+
+
+      removeElTimeout = setTimeout(function () {
+        existing.forEach(function (grid) {
+          if (grid && grid.parentNode) {
+            grid.parentNode.removeChild(grid);
+          }
+        });
+        removeElTimeout = null;
       }, 500);
     }
 
-    var gridWrap = createDiv(container, newGridClassName);
+    var grid = createDiv(container, newGridClassName);
+    var linesWrap = createDiv(grid, 'tgchart__grid-lines');
+    var valuesWrap = createDiv(grid, 'tgchart__grid-values');
     var pointsCount = maxValue === 0 ? 1 : 6;
 
     for (i = 0; i < pointsCount; i++) {
-      d = createDiv(gridWrap, 'tgchart__grid-line', {
+      createDiv(linesWrap, 'tgchart__grid-line', {
         bottom: i * 18 + '%'
       });
-    }
-
-    var gridWrap = createDiv(container, newGridClassName);
-    gridWrap.style.zIndex = 2;
-    var pointsCount = maxValue === 0 ? 1 : 6;
-
-    for (i = 0; i < pointsCount; i++) {
       yVal = formatLongNumber(Math.floor(maxValue * i * 18 / 100));
-      createDiv(gridWrap, 'tgchart__grid-value', {
+      createDiv(valuesWrap, 'tgchart__grid-value', {
         bottom: i * 18 + '%'
       }).innerText = yVal;
     }
@@ -302,12 +313,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     return XAxisScroller;
   }();
 
-  function _animate(duration, stepFunc) {
+  function _animate(duration, stepFunc, onFinish) {
     return animateValue.call(this, 0, 100, duration, function () {
       // Remove first arg
       var args = [].slice.call(arguments, 1);
       return stepFunc.apply(this, args);
-    });
+    }, onFinish);
   }
 
   function animateValue(from, to, duration, stepFunc, onFinish) {
@@ -871,10 +882,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           }
         }
 
-        if (futureMaxValue !== this.maxValue) {
-          this.setMaxValue(futureMaxValue);
-        }
-
+        this.setMaxValue(futureMaxValue);
         this.redrawFrameView(); // Show / hide
 
         this.svg.querySelector('#' + dataset.id).style.opacity = visible ? 1 : 0;
