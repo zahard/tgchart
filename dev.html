@@ -14,6 +14,7 @@
     <h2>Followers</h2>
     <div class="page-wrap">
         <div class="chart-wrap"></div>
+        <div class="chart-wrap"></div>
     </div>
     <div class="theme-switch">
         <button>Switch to <i class="night">Day</i><i class="day">Night</i> Mode</button>
@@ -26,7 +27,7 @@
         var charts = [];
 
         for (var i =0; i< wrappers.length; i++) {
-            charts.push(new TgChart(wrappers[i], chartData[0]));
+            charts.push(new TgChart(wrappers[i], chartData[i+3]));
         }
 
         document.querySelector('.theme-switch').addEventListener('click', function(){

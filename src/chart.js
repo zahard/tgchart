@@ -25,7 +25,7 @@ export default class Chart {
 
     this.prevMaxValue = 0;
     this.maxValue = 0;
-    this.rootOffset = 0;
+    this.rootOffset = -1;
     
     this.parseGraphData(graph);
 
@@ -307,12 +307,15 @@ export default class Chart {
   udpateRootOffset() {  
     var offset = this.viewWidthPt * this.viewOffset / this.viewWidth;
 
+    this.svg.setAttribute('viewBox', `${offset} 0 400 320`);
+    return;
+
     if (offset === this.rootOffset) {
       return;
     }
 
     // Predictive set to 33% of progress and animation to the end
-    var offsetMomental = offset - (offset - this.rootOffset) * 0.4;
+    var offsetMomental = offset - (offset - this.rootOffset) * 0.2;
 
     this.svg.setAttribute('viewBox', `${offsetMomental} 0 400 320`);
     this.rootOffset = offsetMomental;
@@ -321,7 +324,7 @@ export default class Chart {
       this.svgAnimation.cancelled = true;
     }
 
-    this.svgAnimation = animateValue(offsetMomental, offset, 200, (value) => {
+    this.svgAnimation = animateValue(offsetMomental, offset, 100, (value) => {
       this.svg.setAttribute('viewBox', `${value} 0 400 320`);
       this.rootOffset = value;
     });

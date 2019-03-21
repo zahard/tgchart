@@ -16,19 +16,23 @@ export function drawYAxis(container, maxValue, prevMax) {
 
     // If grid was already drawed
     if (oldGrids && oldGrids.length) {
-      var existing = []
-      for (i = 0; i < oldGrids.length; i++) {
-        if (i < 1) {
-          existing.push(oldGrids[i]);
-        } else {
-          oldGrids[i].parentNode.removeChild(oldGrids[i]);  
-        }
-      }
 
       var animationDirection = prevMax > maxValue  ? 'up' : 'down'
       newGridClassName = 'tgchart__grid tgchart__grid--fadein-' + animationDirection;
 
-      existing.forEach((grid) => {
+      // Leave One of a kind
+      var unique = [];
+      var selectors = ['.tgchart__grid-lines', '.tgchart__grid-values'];
+      selectors.forEach(() => {
+        var match = Array.from(container.querySelectorAll(selectors));
+        if (!match.length) {
+          return;
+        }
+        unique.push(match.shift());
+        match.forEach(el => container.removeChild(el));
+      });
+
+      unique.forEach((grid) => {
         grid.className = 'tgchart__grid tgchart__grid--fadeout-' + animationDirection;
       });
 
@@ -37,7 +41,7 @@ export function drawYAxis(container, maxValue, prevMax) {
       }
       // Remove used grid from DOM after animation
       removeElTimeout = setTimeout(() => {
-        existing.forEach((grid) => {
+        unique.forEach((grid) => {
           if (grid && grid.parentNode) {
            grid.parentNode.removeChild(grid);
           }
@@ -46,9 +50,10 @@ export function drawYAxis(container, maxValue, prevMax) {
       }, 500);
     }
 
-    var grid = createDiv(container, newGridClassName);
-    var linesWrap = createDiv(grid, 'tgchart__grid-lines');
-    var valuesWrap = createDiv(grid, 'tgchart__grid-values');
+    
+    //var grid = createDiv(container, newGridClassName);
+    var linesWrap = createDiv(container, 'tgchart__grid-lines ' + newGridClassName);
+    var valuesWrap = createDiv(container, 'tgchart__grid-values ' + newGridClassName);
 
     var pointsCount = maxValue === 0 ? 1 : 6;
     for (i = 0; i < pointsCount; i++) {

@@ -174,29 +174,19 @@
 
 
 .tgchart__grid {
+  position: absolute;
+  height: 100%;
+  width: 100%;
   animation-duration: 0.3s;
   animation-fill-mode: forwards;
-  height: 100%;
-  position: absolute;
-  width: 100%;
-  z-index: 0;
-}
-
-.tgchart__scale {
-
 }
 
 .tgchart__grid-lines {
-  height: 100%;
-  width: 100%;
-  position: relative;
-  position: absolute;
+  z-index: 0;
 }
+
 .tgchart__grid-values {
-  height: 100%;
-  width: 100%;
   z-index: 2;
-  position: absolute;
 }
 
 .tgchart__grid--fadein-up {
@@ -383,7 +373,7 @@
   animation-duration: 0.5s;
   animation-fill-mode: forwards;
   animation-name: showelement;
-  transition: left 0.1s, width 0.1s;
+  /*transition: left 0.1s, width 0.1s;*/
 }
 
 .tgchart__x-points > div {
