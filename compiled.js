@@ -124,6 +124,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   }
 
   function getPathPoints(data, maxValue, h, pointsOffset) {
+    var halfPathWidth = 1;
     var len = data.length;
     var dx = 0;
     var pathPoints = [];
@@ -133,8 +134,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       value = h * (1 - data[i] / maxValue);
       pathPoints.push(dx, value);
       dx += pointsOffset;
-    }
+    } // Offset first and last pints to be visible
 
+
+    pathPoints[0] = halfPathWidth;
+    pathPoints[pathPoints.length - 2] -= halfPathWidth;
     return pathPoints;
   }
 
@@ -251,13 +255,14 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         }
 
         var step = maxDataIndex / mostSuitable;
-        var visible = [0];
+        var datesOffset = Math.round(step / 2);
+        var visible = [datesOffset];
 
         for (var i = 1; i < mostSuitable - 1; i++) {
-          visible.push(Math.round(i * step));
+          visible.push(Math.round(i * step) + datesOffset);
         }
 
-        visible.push(maxDataIndex);
+        visible.push(maxDataIndex - datesOffset);
         var animationDir;
 
         if (this.pointsEl) {
@@ -797,7 +802,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         _this9.drawDatasetCheckbox(d); // Initial path points (zero)
 
 
-        d.points = getPathPoints(new Array(_this9.dataLen).fill(0), 100, _this9.viewHeightPt, _this9.pointOffset);
+        d.points = getPathPoints(new Array(_this9.dataLen).fill(0), 100, _this9.viewHeightPt, _this9.pointOffset, 5);
         drawPath(_this9.svg, buildPath(d.points), d.color, 2, d.id);
       });
       this.redrawFrameView(100);
@@ -872,13 +877,13 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         if (!visible) {
           // Hide animation
           fillValue = this.maxValue > futureMaxValue ? 150 : 0;
-          var path = getPathPoints(new Array(this.dataLen).fill(fillValue), 100, this.viewHeightPt, this.pointOffset);
+          var path = getPathPoints(new Array(this.dataLen).fill(fillValue), 100, this.viewHeightPt, this.pointOffset, 5);
           this.animate(dataset, path, 300);
         } else {
           if (dataset.animation.finished) {
             // Update path of hidden dataset to appear from correct direction
             fillValue = futureMaxValue > this.maxValue ? 150 : 0;
-            dataset.points = getPathPoints(new Array(this.dataLen).fill(fillValue), 100, this.viewHeightPt, this.pointOffset);
+            dataset.points = getPathPoints(new Array(this.dataLen).fill(fillValue), 100, this.viewHeightPt, this.pointOffset, 5);
           }
         }
 
@@ -905,7 +910,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         animationDur = animationDur || 300;
         this.datasets.forEach(function (d) {
           if (d.visible) {
-            var path = getPathPoints(d.data, _this12.maxValue, _this12.viewHeightPt, _this12.pointOffset);
+            var path = getPathPoints(d.data, _this12.maxValue, _this12.viewHeightPt, _this12.pointOffset, 5);
 
             _this12.animate(d, path, animationDur);
           }
@@ -964,7 +969,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
               d.animation.cancelled = true;
             }
 
-            d.points = getPathPoints(d.data, _this13.maxValue, _this13.viewHeightPt, _this13.pointOffset);
+            d.points = getPathPoints(d.data, _this13.maxValue, _this13.viewHeightPt, _this13.pointOffset, 5);
             updatePath(buildPath(d.points), d.id, _this13.svg); //this.animate(d, points, 200)
           }
         });
@@ -1046,7 +1051,13 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }, {
       key: "udpateRootOffset",
       value: function udpateRootOffset() {
-        var offset = this.viewWidthPt * this.viewOffset / this.viewWidth; //offset += 10;
+        var offset = this.viewWidthPt * this.viewOffset / this.viewWidth; // var offsetWithPadding = offset;
+        // if (this.viewWidth < 99.99) {
+        //   var maxOffset = this.viewWidthPt * (100 - this.viewWidth) / this.viewWidth;
+        //   var padding = 10;
+        //   var maxRange = maxOffset + padding * 2;
+        //   offsetWithPadding = maxRange * (offset/maxOffset) - padding;
+        // }
 
         this.svg.setAttribute('viewBox', "".concat(offset, " 0 400 320"));
       }

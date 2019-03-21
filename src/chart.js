@@ -278,7 +278,6 @@ export default class Chart {
   }
 
   setView(viewWidth, viewOffset) {
-    console.log('New offset ->', viewOffset)
     var prev = {
       width: this.viewWidth,
       offset: this.viewOffset,
