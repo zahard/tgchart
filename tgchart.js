@@ -174,7 +174,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       var unique = [];
       var selectors = ['.tgchart__grid-lines', '.tgchart__grid-values'];
       selectors.forEach(function () {
-        var match = Array.from(container.querySelectorAll(selectors));
+        var match = [].slice.call(container.querySelectorAll(selectors));
 
         if (!match.length) {
           return;
@@ -813,7 +813,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         _this9.drawDatasetCheckbox(d); // Initial path points (zero)
 
 
-        d.points = getPathPoints(new Array(_this9.dataLen).fill(0), 100, _this9.viewHeightPt, _this9.pointOffset, 5);
+        d.points = _this9.getEqualDataPoints(0);
         drawPath(_this9.svg, buildPath(d.points), d.color, 2, d.id);
       });
       this.redrawFrameView(100);
@@ -888,13 +888,13 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         if (!visible) {
           // Hide animation
           fillValue = this.maxValue > futureMaxValue ? 150 : 0;
-          var path = getPathPoints(new Array(this.dataLen).fill(fillValue), 100, this.viewHeightPt, this.pointOffset, 5);
+          var path = this.getEqualDataPoints(100);
           this.animate(dataset, path, 300);
         } else {
           if (dataset.animation.finished) {
             // Update path of hidden dataset to appear from correct direction
             fillValue = futureMaxValue > this.maxValue ? 150 : 0;
-            dataset.points = getPathPoints(new Array(this.dataLen).fill(fillValue), 100, this.viewHeightPt, this.pointOffset, 5);
+            dataset.points = this.getEqualDataPoints(fillValue);
           }
         }
 
@@ -1065,6 +1065,17 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       value: function udpateRootOffset() {
         var offset = this.viewWidthPt * this.viewOffset / this.viewWidth;
         this.svg.setAttribute('viewBox', "".concat(offset, " 0 400 320"));
+      }
+    }, {
+      key: "getEqualDataPoints",
+      value: function getEqualDataPoints(value) {
+        var data = [];
+
+        for (var i = 0; i < this.dataLen; i++) {
+          data.push(value);
+        }
+
+        return getPathPoints(data, 100, this.viewHeightPt, this.pointOffset);
       }
     }]);
 

@@ -60,7 +60,7 @@ export default class Chart {
       // Insert dataset checkbox 
       this.drawDatasetCheckbox(d);
       // Initial path points (zero)
-      d.points = getPathPoints(new Array(this.dataLen).fill(0), 100, this.viewHeightPt, this.pointOffset, 5);
+      d.points = this.getEqualDataPoints(0);
       drawPath(this.svg, buildPath(d.points), d.color, 2, d.id);
     });
 
@@ -129,15 +129,13 @@ export default class Chart {
     if (!visible) {
       // Hide animation
       fillValue = this.maxValue  > futureMaxValue ? 150 : 0;
-      var path = getPathPoints(new Array(this.dataLen)
-        .fill(fillValue), 100, this.viewHeightPt, this.pointOffset, 5);
+      var path = this.getEqualDataPoints(100);
       this.animate(dataset, path, 300);
     } else {
       if (dataset.animation.finished) {
         // Update path of hidden dataset to appear from correct direction
         fillValue = futureMaxValue >  this.maxValue ? 150 : 0;
-        dataset.points = getPathPoints(new Array(this.dataLen)
-        .fill(fillValue), 100, this.viewHeightPt, this.pointOffset, 5);
+        dataset.points = this.getEqualDataPoints(fillValue);
       }
     }
 
@@ -303,6 +301,15 @@ export default class Chart {
     var offset = this.viewWidthPt * this.viewOffset / this.viewWidth;
     this.svg.setAttribute('viewBox', `${offset} 0 400 320`);
   }
+
+  getEqualDataPoints(value) {
+    var data = [];
+    for (var i = 0; i < this.dataLen; i++) {
+      data.push(value);
+    }
+    return getPathPoints(data, 100, this.viewHeightPt, this.pointOffset);
+  }
+    
 
 }
 

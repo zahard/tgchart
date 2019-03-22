@@ -24,7 +24,7 @@ export function drawYAxis(container, maxValue, prevMax) {
       var unique = [];
       var selectors = ['.tgchart__grid-lines', '.tgchart__grid-values'];
       selectors.forEach(() => {
-        var match = Array.from(container.querySelectorAll(selectors));
+        var match = [].slice.call(container.querySelectorAll(selectors));
         if (!match.length) {
           return;
         }
